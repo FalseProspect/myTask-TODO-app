@@ -35,7 +35,7 @@ header{
 
 header input{
   margin-left: 200px;
-  width: calc(100% - 200px); /*Accommodate for Menu and Logo*/
+  width: calc(100% - 200px); /*Menu and Logo svg = ~200px*/
   height: 50px;
   float: left;
   color: #fff;
@@ -118,6 +118,7 @@ header button#Menu svg {
   width: 100%;
   float: left;
   padding: 15px;
+  transition: transform 1s ease;
 }
 
 ul.todoList{
@@ -256,4 +257,33 @@ ul.todoList#todo:after{
   text-align: center;
   font-size: 14px;
   color: #aaa;
+}
+
+.menu{
+  position: fixed;
+  width: 200px;
+  background: var(--backColor);
+  height: 100%; 
+  transform: translateX(-200px);
+  transition: transform .3s ease;
+}
+
+.menu a{
+  display: block;
+  position: relative;
+  width: 100%;
+  height: 4em;
+  padding: 1.5em 0 0 0;
+  margin: 1em 0 1em 0;
+  text-decoration: none;
+  text-align: center;
+  background: var(--backColor);
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+  cursor: pointer;
+}
+
+.menu a:hover{
+  background: #999;
+  cursor: pointer;
 }
