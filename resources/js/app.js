@@ -79,6 +79,10 @@ document.getElementById('night').addEventListener('click', function(){
 //Set Night Mode
 function setNightMode(value){
   document.documentElement.style.setProperty('--backColor', value ? '#282828' : '#edf0f1');
+  document.documentElement.style.setProperty('--containerTextColor', value ? '#aaa' : '#666');
+  document.documentElement.style.setProperty('--menuHoverColor', value ? '#444' : '#aaa');
+  document.documentElement.style.setProperty('--itemColor', value ? '#444' : '#fff');
+  document.documentElement.style.setProperty('--itemTextColor', value ? '#ddd' : '#444');
   console.log(`Night mode: ${nightMode}`);
   document.getElementById('nightLabel').innerHTML =`Night Mode: ${nightMode ? 'ON' : 'OFF'}`;
   localStorage.setItem('nightMode', JSON.stringify(value));

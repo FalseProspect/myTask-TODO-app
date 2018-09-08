@@ -9,8 +9,11 @@
   --mainAccent: #46237a;
   --backColor: #edf0f1; /* //Dark: #282828 //Light: #edf0f1 */
   --itemColor: #ffffff;
-  --containerTextColor: #aaa;
+  --containerTextColor: #666;
   --inputTextColor: #fff;
+  --itemTextColor: #444;
+  --menuHoverColor: #999;
+  --buttonColor: #fff;
 }
 
 body{
@@ -34,6 +37,7 @@ header{
   box-shadow: 0px 2px 4px rgba(44, 62, 80, 0.15);
   border-bottom-left-radius: 10px;
   border-bottom-right-radius: 10px;
+  transition: background 0.2s ease;
 }
 
 header input{
@@ -81,7 +85,7 @@ header button{
   right: 15px;
   z-index: 2;
   border-radius: 25px;
-  background: var(--itemColor);
+  background: var(--buttonColor);
   border: 0px;
   box-shadow: none;
   outline: none;
@@ -104,7 +108,7 @@ header button#Menu{
 }
 
 header button#Menu svg .fill{
-  fill: var(--itemColor);
+  fill: var(--buttonColor);
 }
 
 header button#Menu svg {
@@ -136,7 +140,7 @@ ul.todoList li{
   float: left;
   font-size: 14px;
   font-weight: 500;
-  color: #444;
+  color: var(--itemTextColor);
   line-height: 22px;
   background: var(--itemColor);
   border-radius: 5px;
@@ -221,7 +225,7 @@ ul.todoList li .buttons button.remove svg .fill{
 }
 
 ul.todoList li .buttons button.remove:hover svg .fill{
-fill: #e85656;
+  fill: #e85656;
 }
 
 ul.todoList li .buttons button.complete svg .fill{
@@ -293,7 +297,7 @@ ul.todoList#todo:after{
 
 .menu a:hover{
   color: var(--inputTextColor);
-  background: #999;
+  background: var(--menuHoverColor);
   cursor: pointer;
 }
 
