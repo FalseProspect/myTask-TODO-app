@@ -7,7 +7,7 @@
 
 :root{
   --mainAccent: #46237a;
-  --backColor: #edf0f1;
+  --backColor: #edf0f1; /* //Dark: #282828 //Light: #edf0f1 */
   --itemColor: #ffffff;
   --containerTextColor: #aaa;
   --inputTextColor: #fff;
@@ -299,4 +299,24 @@ ul.todoList#todo:after{
 
 .menu a:active{
   color: var(--inputTextColor);
+}
+
+.menu a svg{
+  width: 30px;
+  height: 30px;
+  position: absolute;
+  top: 43%;
+  left: 15%;
+  margin: -8px 0 0 -8px;
+  fill: var(--containerTextColor);
+}
+
+.menu a:hover svg,
+.menu a:active svg{
+  fill: var(--inputTextColor);
+}
+
+.menu a div#themeLabel,
+.menu a div#nightLabel{
+  margin-left: 38px;
 }
