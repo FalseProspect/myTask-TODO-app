@@ -64,8 +64,8 @@ document.getElementById('theme').addEventListener('click', function(){
 //Theme Switcher
 function themeSwitch(index){
   let theme = themes[index];
-  document.getElementById('themeLabel').innerHTML =`Theme: ${theme.name}`;
   console.log(`Theme: ${theme.name}`);
+  document.getElementById('themeLabel').innerHTML =`Theme: ${theme.name}`;
   document.documentElement.style.setProperty('--mainAccent', theme.mainColor);
   localStorage.setItem('themeIndex', JSON.stringify(index));
 };
@@ -105,7 +105,27 @@ document.getElementById('item').addEventListener('keydown',function (e) {
   }
   });
 
+  let cmdMode = false
+
+  function sumbitCommand(value){
+    console.log(`Command: ${value}`);
+  }
+
+
   function submitItem(value){
+    //Command Mode Check
+    if (value === "```"){
+      cmdMode = !cmdMode;
+      console.log(`commandMode: ${cmdMode}`);
+      cmdMode ? document.getElementById('themeLabel').innerHTML =`Theme: ${'cmd'}`: themeSwitch(themeIndex);
+      cmdMode ? document.documentElement.style.setProperty('--mainAccent', '#000') : themeSwitch(themeIndex);
+      document.getElementById('item').value = ''; //Clear input bar
+      return;
+    } else if(cmdMode === true){
+      sumbitCommand(value);
+      return;
+    } else
+    //Normal Submit
     addItemTodo(value);
     document.getElementById('item').value = ''; //Clear input bar
 
