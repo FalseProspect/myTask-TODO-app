@@ -30,7 +30,7 @@ new theme('Ocean','#454ADE'),
 new theme('Mint','#25B99A')];
 
 //Initial Todo Render
-renderTodoList(); 
+renderList(); 
 
 //Initial Theme Render
 themeSwitch(themeIndex);
@@ -40,6 +40,9 @@ setNightMode(nightMode);
 
 // Menu status
 let menuOpen = false; 
+
+//Command Variable
+let cmdMode = false
 
 //Menu Event Listener
 document.getElementById('Menu').addEventListener('click', menuClickEvent);
@@ -57,14 +60,14 @@ function menuClickEvent(){
 //Theme change click event
 document.getElementById('theme').addEventListener('click', function(){
   themeIndex !== themes.length - 1 ? themeIndex ++ : themeIndex = 0; 
-  console.log(themeIndex);
+  //console.log(themeIndex);
   themeSwitch(themeIndex);
 });
 
 //Theme Switcher
 function themeSwitch(index){
   let theme = themes[index];
-  console.log(`Theme: ${theme.name}`);
+  //console.log(`Theme: ${theme.name}`);
   document.getElementById('themeLabel').innerHTML =`Theme: ${theme.name}`;
   document.documentElement.style.setProperty('--mainAccent', theme.mainColor);
   localStorage.setItem('themeIndex', JSON.stringify(index));
@@ -83,7 +86,6 @@ function setNightMode(value){
   document.documentElement.style.setProperty('--menuHoverColor', value ? '#444' : '#aaa');
   document.documentElement.style.setProperty('--itemColor', value ? '#444' : '#fff');
   document.documentElement.style.setProperty('--itemTextColor', value ? '#ddd' : '#444');
-  console.log(`Night mode: ${nightMode}`);
   document.getElementById('nightLabel').innerHTML =`Night Mode: ${nightMode ? 'ON' : 'OFF'}`;
   localStorage.setItem('nightMode', JSON.stringify(value));
 }
@@ -105,10 +107,42 @@ document.getElementById('item').addEventListener('keydown',function (e) {
   }
   });
 
-  let cmdMode = false
+  //Toggle CommandMode
 
+  function toggleCommandMode(status) {
+    status ? document.getElementById('themeLabel').innerHTML = `Theme: ${'cmd'}` : themeSwitch(themeIndex);
+    status ? document.documentElement.style.setProperty('--mainAccent', '#000') : themeSwitch(themeIndex);
+    document.getElementById('item').value = '';
+  }
+
+  //Sumbit Command
   function sumbitCommand(value){
-    console.log(`Command: ${value}`);
+    let command = value.split(' ')
+    let aurgument = command.slice(1,).join(' ');
+    document.getElementById('item').value = ''; //Clear input bar
+    //console.log(aurgument);
+    switch(command[0]){
+      case 'theme':
+        themeSwitch(aurgument);
+        break;
+      case 'cmd':
+        toggleCommandMode(JSON.parse(aurgument));
+        break;
+      case 'night':
+        setNightMode(JSON.parse(aurgument));
+        break;
+      case 'unrender':
+      case 'ur-':
+        unRenderList();
+        break;
+      case 'render':
+      case 'r-':
+        renderList();
+        break;
+      default:
+        console.log(`"${command[0]}" command not recognized`);
+    }
+
   }
 
 
@@ -116,15 +150,15 @@ document.getElementById('item').addEventListener('keydown',function (e) {
     //Command Mode Check
     if (value === "```"){
       cmdMode = !cmdMode;
-      console.log(`commandMode: ${cmdMode}`);
-      cmdMode ? document.getElementById('themeLabel').innerHTML =`Theme: ${'cmd'}`: themeSwitch(themeIndex);
-      cmdMode ? document.documentElement.style.setProperty('--mainAccent', '#000') : themeSwitch(themeIndex);
-      document.getElementById('item').value = ''; //Clear input bar
+      toggleCommandMode(cmdMode); //toggle Command Mode
       return;
+
     } else if(cmdMode === true){
       sumbitCommand(value);
       return;
+
     } else
+
     //Normal Submit
     addItemTodo(value);
     document.getElementById('item').value = ''; //Clear input bar
@@ -133,7 +167,10 @@ document.getElementById('item').addEventListener('keydown',function (e) {
     dataObjectUpdate();
   };
 
-function renderTodoList(){
+
+
+function renderList(){
+  unRenderList(); //Unrender anything present if present
   if (!data.todo.length && !data.completed.length) return;
 
   for (let i = 0; i < data.todo.length; i++){
@@ -148,15 +185,33 @@ function renderTodoList(){
 
 };
 
+
+function unRenderList(){
+  let items = document.querySelectorAll(".item");
+  items[0] ? unrender() : 0 ;
+
+    function unrender(){
+    let list = items[0].parentNode;
+    console.log(items);
+    for (let i = 0; i < items.length; i++){
+      list.removeChild(items[i]);
+    }
+    console.log('Unrender done');
+  };
+
+};
+
 function dataObjectUpdate(){
   localStorage.setItem('todoList', JSON.stringify(data));
   console.log(data);
 };
 
 function removeItem(){
+
   let deletingItem = this.parentNode.parentNode;
   let listParent = deletingItem.parentNode;
   listParent.removeChild(deletingItem);
+
   let listId = listParent.id;
   let itemValue = deletingItem.innerText; //Gets the text only, not list item
 
@@ -212,8 +267,11 @@ function addItemTodo(text, completed){
   //Add button event to complete item
   complete.addEventListener('click', completeItem);
 
+  //Appends item together
   buttons.appendChild(remove);
   buttons.appendChild(complete);
   item.appendChild(buttons);
   list.insertBefore(item, list.childNodes[0]);
+
+  item.className += "item";
 }
