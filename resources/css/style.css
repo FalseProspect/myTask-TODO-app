@@ -8,13 +8,14 @@
 
 :root{
   --mainAccent: #46237a;
-  --backColor: #edf0f1; /* //Dark: #282828 //Light: #edf0f1 */
-  --itemColor: #ffffff;
-  --containerTextColor: #666;
-  --inputTextColor: #fff;
-  --itemTextColor: #444;
-  --menuHoverColor: #999;
-  --buttonColor: #fff;
+  --inputTextColor: #fff;                     /* Light: #ffffff               | Dark:#282828 */
+  --backColor: #edf0f1;                       /* Light: #edf0f1               | Dark:#282828 */
+  --itemColor: #ffffff;                       /* Light: #ffffff               | Dark:#454545 */
+  --containerTextColor: #666;                 /* Light: #666666               | Dark:#282828 */
+  --menuHoverColor: #999;                     /* Light: #999999               | Dark:#444444 */
+  --itemTextColor: #444;                      /* Light: #444444               | Dark:#DDDDDD */
+  --buttonColor: #fff;                        /* Light: #ffffff               | Dark:#282828 */
+  --itemCompleteColor: rgba(255,255,255,.25); /* Light: RGBA(255,255,255,.25) | Dark:RGBA(68,68,68,.3) */
 }
 
 body{
@@ -316,12 +317,38 @@ ul.todoList#todo:after{
   fill: var(--containerTextColor);
 }
 
+.menu a svg#doneIcon{
+  border-radius: 15px;
+  border: 1.5px solid var(--containerTextColor);
+}
+
 .menu a:hover svg,
 .menu a:active svg{
   fill: var(--inputTextColor);
 }
 
+.menu a:hover svg#doneIcon,
+.menu a:active svg#doneIcon{
+  border: 1.5px solid var(--inputTextColor);
+}
+
 .menu a div#themeLabel,
 .menu a div#nightLabel{
   margin-left: 38px;
+}
+
+.menu a div#doneLabel{
+  margin-left: 22px;
+}
+
+ul.todoList li.complete,
+ul.todoList li.deleted {
+  background: var(--itemCompleteColor);
+}
+
+ul.todoList li.deleted .buttons button.complete{
+  visibility: hidden;
+}
+ul.todoList li.deleted .buttons button.remove{
+  margin-left: 25%;
 }

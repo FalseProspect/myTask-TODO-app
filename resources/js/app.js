@@ -2,19 +2,29 @@
   //Todo List Data
   let data = (localStorage.getItem('todoList')) ? JSON.parse(localStorage.getItem('todoList')) : {
   todo: [],
-  completed: []
+  completed: [],
+  deleted: []
   };
-
+  
   // Theme Index
   let themeIndex = (localStorage.getItem('themeIndex')) ? JSON.parse(localStorage.getItem('themeIndex')) : 0 ;
 
   // Night mode status
   let nightMode = (localStorage.getItem('nightMode')) ? JSON.parse(localStorage.getItem('nightMode')) : false;
 
-  // SVG Icons
+// SVG Icons
 let removeSVG = '<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 22 22" style="enable-background:new 0 0 22 22;" xml:space="preserve"><rect class="noFill" width="22" height="22"/><g><g><path class="fill" d="M16.1,3.6h-1.9V3.3c0-1.3-1-2.3-2.3-2.3h-1.7C8.9,1,7.8,2,7.8,3.3v0.2H5.9c-1.3,0-2.3,1-2.3,2.3v1.3c0,0.5,0.4,0.9,0.9,1v10.5c0,1.3,1,2.3,2.3,2.3h8.5c1.3,0,2.3-1,2.3-2.3V8.2c0.5-0.1,0.9-0.5,0.9-1V5.9C18.4,4.6,17.4,3.6,16.1,3.6z M9.1,3.3c0-0.6,0.5-1.1,1.1-1.1h1.7c0.6,0,1.1,0.5,1.1,1.1v0.2H9.1V3.3z M16.3,18.7c0,0.6-0.5,1.1-1.1,1.1H6.7c-0.6,0-1.1-0.5-1.1-1.1V8.2h10.6L16.3,18.7L16.3,18.7z M17.2,7H4.8V5.9c0-0.6,0.5-1.1,1.1-1.1h10.2c0.6,0,1.1,0.5,1.1,1.1V7z"/></g><g><g><path class="fill" d="M11,18c-0.4,0-0.6-0.3-0.6-0.6v-6.8c0-0.4,0.3-0.6,0.6-0.6s0.6,0.3,0.6,0.6v6.8C11.6,17.7,11.4,18,11,18z"/></g><g><path class="fill" d="M8,18c-0.4,0-0.6-0.3-0.6-0.6v-6.8C7.4,10.2,7.7,10,8,10c0.4,0,0.6,0.3,0.6,0.6v6.8C8.7,17.7,8.4,18,8,18z"/></g><g><path class="fill" d="M14,18c-0.4,0-0.6-0.3-0.6-0.6v-6.8c0-0.4,0.3-0.6,0.6-0.6c0.4,0,0.6,0.3,0.6,0.6v6.8C14.6,17.7,14.3,18,14,18z"/></g></g></g></svg>';
 let completeSVG = '<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 22 22" style="enable-background:new 0 0 22 22;" xml:space="preserve"><rect y="0" class="noFill" width="22" height="22"/><g><path class="fill" d="M9.7,14.4L9.7,14.4c-0.2,0-0.4-0.1-0.5-0.2l-2.7-2.7c-0.3-0.3-0.3-0.8,0-1.1s0.8-0.3,1.1,0l2.1,2.1l4.8-4.8c0.3-0.3,0.8-0.3,1.1,0s0.3,0.8,0,1.1l-5.3,5.3C10.1,14.3,9.9,14.4,9.7,14.4z"/></g></svg>';
 let themeSVG = '<svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="-167.5 435.5 30 30" style="enable-background:new -167.5 435.5 30 30;" xml:space="preserve"><g><path class="fill" d="M-141.8,440.9c-3-3.5-7-5.4-11.2-5.4c-3.5,0-6.9,1.4-9.4,3.8c-4,3.9-5.4,8.6-3.7,12.9c1.4,3.4,4.6,5.9,7.8,5.9c0.1,0,0.2,0,0.3,0c0.5,0,0.9-0.1,1.4-0.1c0.5,0,1-0.1,1.5-0.1c1.1,0,2,0,2,2.7c0,2.9,1.8,4.9,4.3,4.9c0,0,0,0,0,0c1.8,0,3.8-1,5.8-3c2.6-2.6,4.4-6.3,4.8-10.1C-137.8,448.2-139.1,444.1-141.8,440.9z M-144.5,461c-1.6,1.6-3.1,2.4-4.3,2.4c-1.6,0-2.2-1.5-2.2-2.9c0-3.3-1.3-4.8-4.1-4.8c-0.5,0-1.1,0-1.7,0.1c-0.4,0-0.9,0.1-1.3,0.1c-0.1,0-0.1,0-0.2,0c-2.3,0-4.8-1.9-5.9-4.6c-1.4-3.4-0.2-7.3,3.2-10.6c2.1-2.1,5-3.2,8-3.2c3.6,0,7,1.7,9.6,4.7C-138.3,448.2-140,456.4-144.5,461z"/><path class="fill" d="M-148,452.3c0,1.7,1.4,3.2,3.1,3.2c1.7,0,3.1-1.4,3.1-3.2c0-1.7-1.4-3.2-3.1-3.2C-146.6,449.1-148,450.5-148,452.3z M-143.9,452.3c0,0.6-0.5,1.1-1.1,1.1c-0.6,0-1.1-0.5-1.1-1.1c0-0.6,0.5-1.1,1.1-1.1C-144.3,451.2-143.9,451.7-143.9,452.3z"/><path class="fill" d="M-144.6,444.9c0-1.7-1.4-3.2-3.1-3.2c-1.7,0-3.1,1.4-3.1,3.2c0,1.7,1.4,3.2,3.1,3.2C-146,448.1-144.6,446.7-144.6,444.9z M-148.8,444.9c0-0.6,0.5-1.1,1.1-1.1c0.6,0,1.1,0.5,1.1,1.1c0,0.6-0.5,1.1-1.1,1.1C-148.3,446-148.8,445.5-148.8,444.9z"/><path class="fill" d="M-154.9,439.5c-1.7,0-3.1,1.4-3.1,3.2c0,1.7,1.4,3.2,3.1,3.2s3.1-1.4,3.1-3.2C-151.8,440.9-153.2,439.5-154.9,439.5z M-154.9,443.7c-0.6,0-1.1-0.5-1.1-1.1c0-0.6,0.5-1.1,1.1-1.1c0.6,0,1.1,0.5,1.1,1.1C-153.8,443.2-154.3,443.7-154.9,443.7z"/><path class="fill" d="M-160.3,444.9c-1.7,0-3.1,1.4-3.1,3.2c0,1.7,1.4,3.2,3.1,3.2s3.1-1.4,3.1-3.2C-157.2,446.3-158.6,444.9-160.3,444.9z M-160.3,449.1c-0.6,0-1.1-0.5-1.1-1.1c0-0.6,0.5-1.1,1.1-1.1c0.6,0,1.1,0.5,1.1,1.1C-159.3,448.6-159.8,449.1-160.3,449.1z"/></g></svg>';
+
+// Views
+const viewings = {
+  TASKS: 'tasks',
+  DELETED: 'deleted',
+  DONE_TASKS: 'completed',
+}
+
+let view = viewings.TASKS;
 
 //Themes
 const theme = function(themeName,mainColor){
@@ -22,15 +32,15 @@ const theme = function(themeName,mainColor){
   this.mainColor = mainColor;
 };
 const themes = [
-new theme('Royal','#46237a'),
-new theme('Pumpkin','#FF4E00'),
-new theme('Rum','#501F32 '),
-new theme('Sunny','#F3A712'),
-new theme('Ocean','#454ADE'),
-new theme('Mint','#25B99A')];
+new theme('Royal','RGBA(70,35,122,1)'),     // #46237a RGBA(70,35,122,1)
+new theme('Pumpkin','RGBA(255,78,0,1)'),    // #FF4E00 RGBA(255,78,0,1)
+new theme('Rum','RGBA(80,31,50,1)'),        // #501F32 RGBA(80,31,50,1)
+new theme('Honey','RGBA(243,167,18,1)'),    // #F3A712 RGBA(243,167,18,1)
+new theme('Ocean','RGBA(69,74,222,1)'),     // #454ADE RGBA(69,74,222,1)
+new theme('Mint','RGBA(37,185,154,1)')];    // #25B99A RGBA(37,185,154,1)
 
 //Initial Todo Render
-renderList(); 
+renderList(view); 
 
 //Initial Theme Render
 themeSwitch(themeIndex);
@@ -82,13 +92,29 @@ document.getElementById('night').addEventListener('click', function(){
 //Set Night Mode
 function setNightMode(value){
   document.documentElement.style.setProperty('--backColor', value ? '#282828' : '#edf0f1');
+  document.documentElement.style.setProperty('--itemColor', value ? '#454545' : '#fff');
   document.documentElement.style.setProperty('--containerTextColor', value ? '#aaa' : '#666');
   document.documentElement.style.setProperty('--menuHoverColor', value ? '#444' : '#aaa');
-  document.documentElement.style.setProperty('--itemColor', value ? '#444' : '#fff');
   document.documentElement.style.setProperty('--itemTextColor', value ? '#ddd' : '#444');
+  document.documentElement.style.setProperty('--itemCompleteColor', value ? 'rgba(68,68,68,.3)' : 'rgba(255,255,255,.25)');
   document.getElementById('nightLabel').innerHTML =`Night Mode: ${nightMode ? 'ON' : 'OFF'}`;
   localStorage.setItem('nightMode', JSON.stringify(value));
 }
+
+//Task Button
+document.getElementById('tasks').addEventListener('click', function(){
+  renderList(viewings.TASKS);
+});
+
+//Delete Button
+document.getElementById('deleted').addEventListener('click', function(){
+  renderList(viewings.DELETED);
+});
+
+//Completed Button
+document.getElementById('done').addEventListener('click', function(){
+  renderList(viewings.DONE_TASKS);
+});
 
 //Add button pressed
 document.getElementById('add').addEventListener('click', function(){
@@ -139,6 +165,14 @@ document.getElementById('item').addEventListener('keydown',function (e) {
       case 'r-':
         renderList();
         break;
+      case 'clear':
+      case 'c-':
+        localStorage.clear();
+        break;
+      case 'view':
+      case 'v-':
+        console.log(view);
+        break;
       default:
         console.log(`"${command[0]}" command not recognized`);
     }
@@ -160,7 +194,10 @@ document.getElementById('item').addEventListener('keydown',function (e) {
     } else
 
     //Normal Submit
+    view !== viewings.TASKS ? renderList(viewings.TASKS): 0; //Switch to task list if not already before submit
+    
     addItemTodo(value);
+    
     document.getElementById('item').value = ''; //Clear input bar
 
     data.todo.push(value); //Push to data array
@@ -169,30 +206,50 @@ document.getElementById('item').addEventListener('keydown',function (e) {
 
 
 
-function renderList(){
+function renderList(renderView){
   unRenderList(); //Unrender anything present if present
-  if (!data.todo.length && !data.completed.length) return;
-
-  for (let i = 0; i < data.todo.length; i++){
-    let value = data.todo[i];
-    addItemTodo(value);
+  view = renderView;
+  console.log(`Currently viewing: ${view}`);
+  switch (renderView){
+    case viewings.TASKS:
+    //Render uncomplete task
+      
+      if (!data.todo.length && !data.completed.length) return;
+      for (let i = 0; i < data.todo.length; i++){
+        let value = data.todo[i];
+        addItemTodo(value);
+      }
+      //render complete task
+      for (let i = 0; i < data.completed.length; i++){
+        let value = data.completed[i];
+        addItemTodo(value, true);
+      }
+      break;
+    case viewings.DELETED:
+      for (let i = 0; i < data.deleted.length; i++){
+        let value = data.deleted[i];
+        addItemTodo(value);
+      }
+      break;
+    case viewings.DONE_TASKS:
+      for (let i = 0; i < data.completed.length; i++){
+        let value = data.completed[i];
+        addItemTodo(value, true);
+      }
+      break;
+    default: 
+    console.log(`Viewing: ${renderView} resulted in a error`);
   }
-
-  for (let i = 0; i < data.completed.length; i++){
-    let value = data.completed[i];
-    addItemTodo(value, true);
-  }
-
 };
 
 
 function unRenderList(){
-  let items = document.querySelectorAll(".item");
+  let items = document.querySelectorAll("li");
   items[0] ? unrender() : 0 ;
 
     function unrender(){
     let list = items[0].parentNode;
-    console.log(items);
+    //console.log(items);
     for (let i = 0; i < items.length; i++){
       list.removeChild(items[i]);
     }
@@ -212,13 +269,21 @@ function removeItem(){
   let listParent = deletingItem.parentNode;
   listParent.removeChild(deletingItem);
 
-  let listId = listParent.id;
+  let itemClass = deletingItem.classList[0];
   let itemValue = deletingItem.innerText; //Gets the text only, not list item
+  ;
 
-  if (listId === 'todo') {
+  //Array Mutation
+  if (itemClass === 'uncomplete') {
     data.todo.splice(data.todo.indexOf(itemValue),1);
-  } else{
+    itemClass = 'deleted';
+    data.deleted.push(itemValue)
+  } else if (itemClass === 'deleted'){
+    data.deleted.splice(data.deleted.indexOf(itemValue),1);
+  } else {                                                   
     data.completed.splice(data.completed.indexOf(itemValue),1);
+    itemClass = 'deleted';
+    data.deleted.push(itemValue)
   }
   dataObjectUpdate();
 }
@@ -232,9 +297,11 @@ function completeItem(){
   if (listId === 'todo') {
     data.todo.splice(data.todo.indexOf(itemValue),1);
     data.completed.push(itemValue);
+    completedItem.className = "complete item";
   } else{
     data.completed.splice(data.completed.indexOf(itemValue),1);
     data.todo.push(itemValue);
+    completedItem.className = "uncomplete item";
   }
   dataObjectUpdate();
   //Targeted list based on the list the item is currently contained in
@@ -242,9 +309,12 @@ function completeItem(){
 
   listParent.removeChild(completedItem);
   targetList.insertBefore(completedItem, targetList.childNodes[0]);
+  
 }
+
 //Add todo item
 function addItemTodo(text, completed){
+
   let list = (completed) ? document.getElementById('completed') : document.getElementById('todo');
 
   let item = document.createElement('li');
@@ -273,5 +343,14 @@ function addItemTodo(text, completed){
   item.appendChild(buttons);
   list.insertBefore(item, list.childNodes[0]);
 
-  item.className += "item";
+ 
+  if (completed || view !== viewings.DELETED){
+    completed ? item.className = "complete" : item.className = "uncomplete";
+  } else {
+    item.className = "deleted";
+  }
+
 }
+
+//If date will be assigned to items, new array is needed but can be assigned using indexOf however, ids will be needed.
+// Or new array for each TASKS, DELETED, DONE but just for dates using parallex indexes
