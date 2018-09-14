@@ -163,7 +163,7 @@ document.getElementById('item').addEventListener('keydown',function (e) {
         break;
       case 'render':
       case 'r-':
-        renderList();
+        renderList(aurgument);
         break;
       case 'clear':
       case 'c-':
@@ -182,30 +182,28 @@ document.getElementById('item').addEventListener('keydown',function (e) {
 
   function submitItem(value){
     //Command Mode Check
-    if (value === "```"){
-      cmdMode = !cmdMode;
-      toggleCommandMode(cmdMode); //toggle Command Mode
-      return;
-
-    } else if(cmdMode === true){
-      sumbitCommand(value);
-      return;
-
-    } else
-
-    //Normal Submit
-    view !== viewings.TASKS ? renderList(viewings.TASKS): 0; //Switch to task list if not already before submit
-    
-    addItemTodo(value);
-    
-    document.getElementById('item').value = ''; //Clear input bar
-
-    data.todo.push(value); //Push to data array
-    dataObjectUpdate();
+    switch(value){
+      case "```":
+        cmdMode = !cmdMode;
+        toggleCommandMode(cmdMode); //toggle Command Mode
+        break;
+      default:
+        if(cmdMode === true){
+          sumbitCommand(value);
+          return;
+        }else{
+          //Normal Submit
+          view !== viewings.TASKS ? renderList(viewings.TASKS): 0; //Switch to task list if not already before submit
+          addItemTodo(value);
+          document.getElementById('item').value = ''; //Clear input bar
+          data.todo.push(value); //Push to data array
+          dataObjectUpdate();
+        }
+    }
   };
 
 
-
+//List Renderer
 function renderList(renderView){
   unRenderList(); //Unrender anything present if present
   view = renderView;
@@ -242,108 +240,111 @@ function renderList(renderView){
   }
 };
 
-
+//List Unrender
 function unRenderList(){
   let items = document.querySelectorAll("li");
-  items[0] ? unrender() : 0 ;
-
-    function unrender(){
+  if (items[0]){
     let list = items[0].parentNode;
-    //console.log(items);
+
     for (let i = 0; i < items.length; i++){
       list.removeChild(items[i]);
     }
     console.log('Unrender done');
   };
-
 };
 
+
+//Update Data
 function dataObjectUpdate(){
   localStorage.setItem('todoList', JSON.stringify(data));
   console.log(data);
 };
 
 function removeItem(){
-
   let deletingItem = this.parentNode.parentNode;
-  let listParent = deletingItem.parentNode;
-  listParent.removeChild(deletingItem);
-
-  let itemClass = deletingItem.classList[0];
+  deletingItem.parentNode.removeChild(deletingItem); //Remove from list it's in
+  let itemClass = deletingItem.className;
   let itemValue = deletingItem.innerText; //Gets the text only, not list item
-  ;
 
-  //Array Mutation
-  if (itemClass === 'uncomplete') {
-    data.todo.splice(data.todo.indexOf(itemValue),1);
-    itemClass = 'deleted';
-    data.deleted.push(itemValue)
-  } else if (itemClass === 'deleted'){
-    data.deleted.splice(data.deleted.indexOf(itemValue),1);
-  } else {                                                   
-    data.completed.splice(data.completed.indexOf(itemValue),1);
-    itemClass = 'deleted';
-    data.deleted.push(itemValue)
+  //Array Mutation and className change
+  switch (itemClass){
+    case 'uncomplete':
+      data.todo.splice(data.todo.indexOf(itemValue),1);
+      itemClass = 'deleted';
+      data.deleted.push(itemValue)
+      break;
+    case 'complete':
+      data.completed.splice(data.completed.indexOf(itemValue),1);
+      itemClass = 'deleted';
+      data.deleted.push(itemValue)
+      break;
+    case 'deleted':
+      data.deleted.splice(data.deleted.indexOf(itemValue),1);
+      break;
   }
+
   dataObjectUpdate();
 }
 
 function completeItem(){
   let completedItem = this.parentNode.parentNode;
   let listParent = completedItem.parentNode;
-  let listId = listParent.id;
-  let itemValue = completedItem.innerText; //Gets the text only, not list item
+  let itemClass = completedItem.className;
+  let itemValue = completedItem.innerText;
 
-  if (listId === 'todo') {
-    data.todo.splice(data.todo.indexOf(itemValue),1);
-    data.completed.push(itemValue);
-    completedItem.className = "complete item";
-  } else{
-    data.completed.splice(data.completed.indexOf(itemValue),1);
-    data.todo.push(itemValue);
-    completedItem.className = "uncomplete item";
+  let targetList = (itemClass === 'uncomplete') ? document.getElementById('completed'):document.getElementById('todo'); //Not needed for myDay extention
+
+  switch (itemClass){
+    case 'uncomplete':
+      data.todo.splice(data.todo.indexOf(itemValue),1);
+      data.completed.push(itemValue);
+      completedItem.className = "complete";
+      listParent.removeChild(completedItem);
+      targetList.insertBefore(completedItem, targetList.childNodes[0]);
+      //listParent.insertBefore(completedItem, listParent.childNodes[listParent.childNodes.length]); // For myDay
+      break;
+    case 'complete':
+      data.completed.splice(data.completed.indexOf(itemValue),1);
+      data.todo.push(itemValue);
+      completedItem.className = "uncomplete";
+      listParent.removeChild(completedItem);
+      targetList.insertBefore(completedItem, targetList.childNodes[0]);
+      break;
   }
-  dataObjectUpdate();
-  //Targeted list based on the list the item is currently contained in
-  let targetList = (listId === 'todo') ? document.getElementById('completed'):document.getElementById('todo');
 
-  listParent.removeChild(completedItem);
-  targetList.insertBefore(completedItem, targetList.childNodes[0]);
+  dataObjectUpdate();
   
 }
 
 //Add todo item
 function addItemTodo(text, completed){
-
+  //Decide which list to add to
   let list = (completed) ? document.getElementById('completed') : document.getElementById('todo');
-
+  //Create list elem and add text
   let item = document.createElement('li');
   item.innerText = text;
-
+  //Create a div for buttons
   let buttons = document.createElement('div');
   buttons.classList.add ('buttons');
-
+  //Create remove button
   let remove = document.createElement('button');
   remove.classList.add ('remove');
   remove.innerHTML = removeSVG;
-
-  //Add button event to remove item
+  //Add button event to remove button
   remove.addEventListener('click', removeItem);
-
+  //Create complete button
   let complete = document.createElement('button');
   complete.classList.add ('complete');
   complete.innerHTML = completeSVG;
-
-  //Add button event to complete item
+  //Add button event to complete button
   complete.addEventListener('click', completeItem);
-
-  //Appends item together
+  //Appends elems together
   buttons.appendChild(remove);
   buttons.appendChild(complete);
   item.appendChild(buttons);
   list.insertBefore(item, list.childNodes[0]);
 
- 
+  //Assign className to item
   if (completed || view !== viewings.DELETED){
     completed ? item.className = "complete" : item.className = "uncomplete";
   } else {
@@ -351,6 +352,3 @@ function addItemTodo(text, completed){
   }
 
 }
-
-//If date will be assigned to items, new array is needed but can be assigned using indexOf however, ids will be needed.
-// Or new array for each TASKS, DELETED, DONE but just for dates using parallex indexes

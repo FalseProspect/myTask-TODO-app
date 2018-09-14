@@ -98,8 +98,8 @@ header button#Menu{
   width: 50px;
   height: 50px;
   position: absolute;
-  top: 8px;
-  left: 15px;
+  top: 15px;
+  left: 10px;
   z-index: 3;
   border-radius: 25px;
   background:none;
@@ -117,9 +117,36 @@ header button#Menu svg {
   width: 30px;
   height: 30px;
   position: absolute;
-  top: 50%;
-  left: 50%;
+  top: 40%;
+  left: 35%;
   margin: -15 0 0 -15;
+}
+
+header button#logo{
+  width: 140px;
+  height: 50px;
+  position: absolute;
+  top: 16px;
+  left: 63px;
+  z-index: 4;
+  background:none;
+  border: 0px;
+  box-shadow: none;
+  outline: none;
+  cursor: pointer;
+}
+
+header button#logo svg {
+  width: 140px;
+  height: 50px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin: 0 0 0 0;
+}
+
+header button#logo svg .fill{
+  fill: var(--buttonColor);
 }
 
 .container{
@@ -239,7 +266,7 @@ ul.todoList#completed{
   padding: 60px 0 0 0;
 }
 
-ul.todoList#completed:before{
+ul.todoList#completed:before{ /*Change this to ::after every list to provide border if border can be made along with date at the top*/
   content: '';
   width: 150px;
   height: 1px;
@@ -250,13 +277,13 @@ ul.todoList#completed:before{
   margin: 0 0 0 -75px;
 }
 
-ul.todoList#todo:empty:after{
-  content: 'You have nothing to-do!';
+ul.todoList#todo:empty::after{
+  content: 'There is nothing here';
   margin: 15px 0 0 0;
 }
 
-ul.todoList#completed:empty:after{
-  content:'You have yet to complete any task.';
+ul.todoList#completed:empty::after{
+  content: ' ';
 }
 
 ul.todoList#completed:after,
@@ -344,6 +371,7 @@ ul.todoList#todo:after{
 ul.todoList li.complete,
 ul.todoList li.deleted {
   background: var(--itemCompleteColor);
+  text-decoration: line-through;
 }
 
 ul.todoList li.deleted .buttons button.complete{
