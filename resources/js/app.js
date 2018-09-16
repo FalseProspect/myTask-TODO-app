@@ -244,10 +244,8 @@ function renderList(renderView){
 function unRenderList(){
   let items = document.querySelectorAll("li");
   if (items[0]){
-    let list = items[0].parentNode;
-
     for (let i = 0; i < items.length; i++){
-      list.removeChild(items[i]);
+      items[i].parentNode.removeChild(items[i]);
     }
     console.log('Unrender done');
   };
