@@ -1,4 +1,7 @@
+//Branch: Phase 2
+
 //localStorage.clear();
+
 // Local Storage
   //Todo List Data
   let data = (localStorage.getItem('todoList')) ? JSON.parse(localStorage.getItem('todoList')) : {
