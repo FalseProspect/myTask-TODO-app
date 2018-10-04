@@ -19,7 +19,10 @@ let username = '';
 
   // Night mode status
   let nightMode = (localStorage.getItem('nightMode')) ? JSON.parse(localStorage.getItem('nightMode')) : false;
-
+ 
+  // menuOpen status
+  let menuOpen = (localStorage.getItem('menuOpen')) ? JSON.parse(localStorage.getItem('menuOpen')) : false;
+  
 // SVG Icons
 let removeSVG = '<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 22 22" style="enable-background:new 0 0 22 22;" xml:space="preserve"><rect class="noFill" width="22" height="22"/><g><g><path class="fill" d="M16.1,3.6h-1.9V3.3c0-1.3-1-2.3-2.3-2.3h-1.7C8.9,1,7.8,2,7.8,3.3v0.2H5.9c-1.3,0-2.3,1-2.3,2.3v1.3c0,0.5,0.4,0.9,0.9,1v10.5c0,1.3,1,2.3,2.3,2.3h8.5c1.3,0,2.3-1,2.3-2.3V8.2c0.5-0.1,0.9-0.5,0.9-1V5.9C18.4,4.6,17.4,3.6,16.1,3.6z M9.1,3.3c0-0.6,0.5-1.1,1.1-1.1h1.7c0.6,0,1.1,0.5,1.1,1.1v0.2H9.1V3.3z M16.3,18.7c0,0.6-0.5,1.1-1.1,1.1H6.7c-0.6,0-1.1-0.5-1.1-1.1V8.2h10.6L16.3,18.7L16.3,18.7z M17.2,7H4.8V5.9c0-0.6,0.5-1.1,1.1-1.1h10.2c0.6,0,1.1,0.5,1.1,1.1V7z"/></g><g><g><path class="fill" d="M11,18c-0.4,0-0.6-0.3-0.6-0.6v-6.8c0-0.4,0.3-0.6,0.6-0.6s0.6,0.3,0.6,0.6v6.8C11.6,17.7,11.4,18,11,18z"/></g><g><path class="fill" d="M8,18c-0.4,0-0.6-0.3-0.6-0.6v-6.8C7.4,10.2,7.7,10,8,10c0.4,0,0.6,0.3,0.6,0.6v6.8C8.7,17.7,8.4,18,8,18z"/></g><g><path class="fill" d="M14,18c-0.4,0-0.6-0.3-0.6-0.6v-6.8c0-0.4,0.3-0.6,0.6-0.6c0.4,0,0.6,0.3,0.6,0.6v6.8C14.6,17.7,14.3,18,14,18z"/></g></g></g></svg>';
 let completeSVG = '<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 22 22" style="enable-background:new 0 0 22 22;" xml:space="preserve"><rect y="0" class="noFill" width="22" height="22"/><g><path class="fill" d="M9.7,14.4L9.7,14.4c-0.2,0-0.4-0.1-0.5-0.2l-2.7-2.7c-0.3-0.3-0.3-0.8,0-1.1s0.8-0.3,1.1,0l2.1,2.1l4.8-4.8c0.3-0.3,0.8-0.3,1.1,0s0.3,0.8,0,1.1l-5.3,5.3C10.1,14.3,9.9,14.4,9.7,14.4z"/></g></svg>';
@@ -67,8 +70,8 @@ themeSwitch(themeIndex);
 //Set Night Mode Status
 setNightMode(nightMode);
 
-// Menu status
-let menuOpen = false; 
+//Menu Status
+menuClickEvent(menuOpen);
 
 //Command Mode (Debug Mode)
 //Command Variable
@@ -127,15 +130,15 @@ const sumbitCommand = (value)=>{
 }})();
 
 //Menu Event Listener
-document.getElementById('Menu').addEventListener('click', menuClickEvent);
-
-function menuClickEvent(){
+document.getElementById('Menu').addEventListener('click', ()=>{
   menuOpen = !menuOpen;
-  //console.log(`Menu is: ${menuOpen === true ? 'open':'closed'}`);
+  menuClickEvent(menuOpen)});
 
-  document.getElementById('itemBin').style.marginLeft = menuOpen === true ? '200px': '0';
-  document.getElementById('sideMenu').style.transform = menuOpen === true ? 'translateX(0px)': 'translateX(-200px)';
-  document.getElementById('itemBin').style.width = menuOpen === true ? 'calc(100% - 200px)': '100%';
+function menuClickEvent(value){
+  document.getElementById('itemBin').style.marginLeft = value === true ? '200px': '0';
+  document.getElementById('sideMenu').style.transform = value === true ? 'translateX(0px)': 'translateX(-200px)';
+  document.getElementById('itemBin').style.width = value === true ? 'calc(100% - 200px)': '100%';
+  localStorage.setItem('menuOpen', JSON.stringify(value));
 };
 
 
@@ -248,24 +251,24 @@ function renderList(renderView){
       if (!data.todo.length && !data.completed.length) return;
       for (let i = 0; i < data.todo.length; i++){
         let value = data.todo[i];
-        addItemTodo(value);
+        addItemTodo(value, false, true);
       }
       //render complete task
       for (let i = 0; i < data.completed.length; i++){
         let value = data.completed[i];
-        addItemTodo(value, true);
+        addItemTodo(value, true, true);
       }
       break;
     case viewings.DELETED:
       for (let i = 0; i < data.deleted.length; i++){
         let value = data.deleted[i];
-        addItemTodo(value);
+        addItemTodo(value, false, true);
       }
       break;
     case viewings.DONE_TASKS:
       for (let i = 0; i < data.completed.length; i++){
         let value = data.completed[i];
-        addItemTodo(value, true);
+        addItemTodo(value, true, true);
       }
       break;
     default: 
@@ -292,10 +295,34 @@ function dataObjectUpdate(){
   console.log(data);
 };
 
+/////// POST REQUEST \\\\\\\\
+
+function post(obj) {
+  // The rest of this code assumes you are not using a library.
+  // It can be made less wordy if you use one.
+  let form = document.createElement("form");
+  form.setAttribute("method", 'post');
+  form.setAttribute("action", '/');
+
+  for(let key in obj) {
+      if(obj.hasOwnProperty(key)) {
+          let hiddenField = document.createElement("input");
+          hiddenField.setAttribute("type", "hidden");
+          hiddenField.setAttribute("name", key);
+          hiddenField.setAttribute("value", obj[key]);
+
+          form.appendChild(hiddenField);
+      }
+  }
+  document.body.appendChild(form);
+  form.submit();
+  document.body.removeChild(form);
+}
+
 /////// ITEM MANIPULATION FUNCTIONS \\\\\\\
 
 //Add todo item
-function addItemTodo(obj, completed){
+function addItemTodo(obj, completed, nopost){
   //Decide which list to add to
   let list = (completed) ? document.getElementById('completed') : document.getElementById('todo');
   //Create list elem and add text
@@ -347,6 +374,8 @@ function addItemTodo(obj, completed){
       break;
   }
 
+  if(nopost){return};
+  post(obj);
 }
 
 //COMPLETE ITEM

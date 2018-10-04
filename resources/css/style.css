@@ -154,7 +154,7 @@ header button#logo svg .fill{
   width: 100%;
   float: left;
   padding: 15px;
-  transition: transform 1s ease;
+  transition: all .5s ease;
 }
 
 ul.todoList{
@@ -326,7 +326,7 @@ ul.todoList#todo:after{
   background: var(--backColor);
   height: 100%; 
   transform: translateX(-200px);
-  transition: transform .3s ease;
+  transition: transform .5s ease;
 }
 
 .menu a{
