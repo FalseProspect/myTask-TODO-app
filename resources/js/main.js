@@ -55,10 +55,10 @@ const themes = [
 
 //List Item Class
 let listItem = function(obj){
+  obj.dateID= (new Date().toString()),
   obj.creationDate= (new Date()).toLocaleDateString('en-US'),
   obj.completionDate= '',
-  obj.deletionDate= '',
-  obj.dateID= (new Date().toString());
+  obj.deletionDate= ''
 };
 
 //Initial Todo Render
@@ -191,6 +191,9 @@ document.getElementById('done').addEventListener('click', function(){
   renderList(viewings.DONE_TASKS);
 });
 
+//Focus on input on load
+document.getElementById('item').focus();
+
 //Add button pressed
 document.getElementById('add').addEventListener('click', function(){
   let value = document.getElementById('item').value;
@@ -230,7 +233,7 @@ function submitItem(value,override){
         };
         listItem(newItem);
         data.todo.push(newItem); //Push to data array
-        addItemTodo(newItem);
+        addItemTodo(newItem,false,true);
         document.getElementById('item').value = ''; //Clear input bar
         dataObjectUpdate();
       }
@@ -251,24 +254,24 @@ function renderList(renderView){
       if (!data.todo.length && !data.completed.length) return;
       for (let i = 0; i < data.todo.length; i++){
         let value = data.todo[i];
-        addItemTodo(value, false, true);
+        addItemTodo(value, false);
       }
       //render complete task
       for (let i = 0; i < data.completed.length; i++){
         let value = data.completed[i];
-        addItemTodo(value, true, true);
+        addItemTodo(value, true);
       }
       break;
     case viewings.DELETED:
       for (let i = 0; i < data.deleted.length; i++){
         let value = data.deleted[i];
-        addItemTodo(value, false, true);
+        addItemTodo(value, false);
       }
       break;
     case viewings.DONE_TASKS:
       for (let i = 0; i < data.completed.length; i++){
         let value = data.completed[i];
-        addItemTodo(value, true, true);
+        addItemTodo(value, true);
       }
       break;
     default: 
@@ -298,31 +301,34 @@ function dataObjectUpdate(){
 /////// POST REQUEST \\\\\\\\
 
 function post(obj) {
-  // The rest of this code assumes you are not using a library.
-  // It can be made less wordy if you use one.
   let form = document.createElement("form");
   form.setAttribute("method", 'post');
+  form.setAttribute("enctype", 'multipart/form-data"');
   form.setAttribute("action", '/');
 
+  //Create temp form with obj data
   for(let key in obj) {
       if(obj.hasOwnProperty(key)) {
           let hiddenField = document.createElement("input");
-          hiddenField.setAttribute("type", "hidden");
+          hiddenField.setAttribute("type", "text");
           hiddenField.setAttribute("name", key);
           hiddenField.setAttribute("value", obj[key]);
 
           form.appendChild(hiddenField);
       }
   }
-  document.body.appendChild(form);
-  form.submit();
+  document.body.appendChild(form);  
+  let formData = new FormData(form);
+  let xhr = new XMLHttpRequest();
+  xhr.open('POST','http://127.0.0.1:7000/submit');
+  xhr.send(formData);
   document.body.removeChild(form);
 }
 
 /////// ITEM MANIPULATION FUNCTIONS \\\\\\\
 
 //Add todo item
-function addItemTodo(obj, completed, nopost){
+function addItemTodo(obj, completed, submit){
   //Decide which list to add to
   let list = (completed) ? document.getElementById('completed') : document.getElementById('todo');
   //Create list elem and add text
@@ -373,9 +379,7 @@ function addItemTodo(obj, completed, nopost){
     item.setAttribute('title',`Deleted: ${obj.deletionDate}`);
       break;
   }
-
-  if(nopost){return};
-  post(obj);
+  if(submit){post(obj);};
 }
 
 //COMPLETE ITEM

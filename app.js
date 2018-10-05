@@ -5,9 +5,7 @@ const cookieSession = require('cookie-session');
 const keys          = require('./config/keys');
 const authRoutes    = require('./routes/auth-routes');
 const passportSetup = require('./config/passport-setup');
-const bodyParser    = require('body-parser');
-
-let urlencodedParser = bodyParser.urlencoded({ exstended:false });
+const Task = require('./models/task-model');
 
 //App
 const app = express();
@@ -16,6 +14,7 @@ app.set('view engine','ejs');
 
 //Static Files Route
 app.use('/resources',express.static('resources'))
+
 
 //CookieSession
 app.use(cookieSession({
@@ -32,18 +31,11 @@ mongoose.connect(keys.mongodb.dbURI,{ useNewUrlParser: true },()=>{console.log('
 
 //Routes
 app.use('/auth',authRoutes);
+app.use('/submit',require('./routes/submit-route'));
 
 //Main
 app.get('/', (req,res) =>{
     res.render('index',{user: req.user});
-});
-
-app.post('/', urlencodedParser, (req,res)=>{
-    if(req.body) {
-        console.log('POST recieved');
-        console.log(req.body);
-        res.redirect('back');
-    }
 });
 
 //Port Listening
