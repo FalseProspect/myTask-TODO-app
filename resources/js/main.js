@@ -55,6 +55,7 @@ const themes = [
 
 //List Item Class
 let listItem = function(obj){
+  obj.uID=((Date.now() + Math.random()).toString()),
   obj.dateID= (new Date().toString()),
   obj.creationDate= (new Date()).toLocaleDateString('en-US'),
   obj.completionDate= '',
@@ -122,12 +123,20 @@ const sumbitCommand = (value)=>{
 (function profileTabUsername(){
   let profileTab = document.getElementById('profile');
   if(profileTab.innerText !== "Sign-In"){
-    profileTab.setAttribute('data-date',' ');
+    profileTab.setAttribute('data-profile',' ');
     profileTab.setAttribute('href','/auth/logout');
   }else{
-  profileTab.setAttribute('data-date','(Offline)');
+  profileTab.setAttribute('data-profile','(Offline)');
   profileTab.setAttribute('href','/auth/google');
-}})();
+  }
+  let user = document.getElementsByTagName('meta')[3].content;
+  console.log(user);
+  let xhr = new XMLHttpRequest();
+  xhr.open('GET','http://127.0.0.1:9000/fetch', true);
+  fetch('http://127.0.0.1:9000/fetch')
+  .then(res => res.json())
+  .then(data => console.log(data))
+})();
 
 //Menu Event Listener
 document.getElementById('Menu').addEventListener('click', ()=>{
@@ -204,7 +213,7 @@ document.getElementById('add').addEventListener('click', function(){
 //'Enter' press = submit
 document.getElementById('item').addEventListener('keydown',function (e) {
   let value = document.getElementById('item').value;
-  if (e.code === "Enter" && value) {submitItem(value);}
+  if (e.key === "Enter" && value) {submitItem(value);}
   });
 
 //Toggle CommandMode
@@ -320,10 +329,17 @@ function post(obj) {
   document.body.appendChild(form);  
   let formData = new FormData(form);
   let xhr = new XMLHttpRequest();
-  xhr.open('POST','http://127.0.0.1:7000/submit');
+  xhr.open('POST','http://127.0.0.1:9000/task');
+  console.log(formData);
   xhr.send(formData);
   document.body.removeChild(form);
 }
+
+function test() {
+  let xhr = new XMLHttpRequest();
+  xhr.open('GET','http://127.0.0.1:9000/load');
+  xhr.send();
+};
 
 /////// ITEM MANIPULATION FUNCTIONS \\\\\\\
 
