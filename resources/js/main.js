@@ -119,6 +119,16 @@ const sumbitCommand = (value)=>{
   }
 }
 
+function syncData(data){      //Just map everything into the template version of the list item obj as is so it can be rendered
+  let qData = [...data];
+  let qTask = qData.map((obj)=>{return obj.task}); //The task it to be displayed/rendered
+  let qData = [...q1];                             //The DateID is to be used to render the order
+  let qDateID = q2.map((obj)=>{return obj.task});
+  console.log(q1);
+  console.log(typeof qData);
+    //Must add logic to read filter out what is uncomplete, complete, or deleted by reading the propertys of the template
+};
+
 //Set values if a user is signed in
 (function profileTabUsername(){
   let profileTab = document.getElementById('profile');
@@ -135,7 +145,7 @@ const sumbitCommand = (value)=>{
   xhr.open('GET','http://127.0.0.1:9000/fetch', true);
   fetch('http://127.0.0.1:9000/fetch')
   .then(res => res.json())
-  .then(data => console.log(data))
+  .then(data => syncData(data))
 })();
 
 //Menu Event Listener
