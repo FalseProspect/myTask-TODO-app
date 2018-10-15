@@ -37,10 +37,10 @@ app.use('/auth',authRoutes);
 app.get('/', (req,res) =>{
     console.log(req.user);
     if(req.user)return res.redirect('/0');
-    res.render('index',{user: req.user});
+    res.render('index',{user: req.user}); //req.user is not sent
 });
 
-//Main
+//Main for users
 app.get('/0', async (req,res) =>{
     console.log(req.user);
     const tasks = await Task.find({owner: req.user._id});
@@ -49,12 +49,7 @@ app.get('/0', async (req,res) =>{
 });
 
 
-//Load Post
-app.get('/load', async (req,res)=>{
-    const tasks = await Task.find({owner: req.user._id});
-    res.send(tasks.map(a=> a.task)).status(200);
-});
-
+//Fetch Post
 app.get('/fetch', async (req,res)=>{
     console.log('fetch request')
     const tasks = await Task.find({owner: req.user._id});
@@ -63,12 +58,7 @@ app.get('/fetch', async (req,res)=>{
     //res.json(tasks).status(200);
 });
 
-//Load Post
-app.get('/get', async (req,res)=>{
-    const tasks = await Task.find({});
-    res.send(tasks).status(200);
-});
-
+//Create Post
 app.post('/task', (req,res) =>{
     console.log(req.user);
     //Multiparty handles formData sent

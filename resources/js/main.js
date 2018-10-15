@@ -119,15 +119,33 @@ const sumbitCommand = (value)=>{
   }
 }
 
-function syncData(data){      //Just map everything into the template version of the list item obj as is so it can be rendered
-  let qData = [...data];
+function extractJSON(dataArr){
+  console.log(dataArr.length);
+  for (let i = 0; i < dataArr.length; i++){
+    console.log(`At ${[i]}`);
+    if(dataArr[i].deletionDate){
+      console.log(`Task:${dataArr[i].task} = deleted`);
+      data.deleted.push(dataArr[i]);
+      return;
+    } else if (dataArr[i].completionDate){
+      console.log(`Task:${dataArr[i].task} = completed`);
+      data.completed.push(dataArr[i]);
+    } else {
+      console.log(`Task:${dataArr[i].task} = todo`);
+      data.todo.push(dataArr[i]);
+    }
+    renderList(view);
+  }
+  console.log('Done');
+}
+
+function syncData(data){
+  console.log('Fetching...');
+  let qData = data;
+  console.log(qData);
   let qTask = qData.map((obj)=>{return obj.task}); //The task it to be displayed/rendered
-  let qData = [...q1];                             //The DateID is to be used to render the order
-  let qDateID = q2.map((obj)=>{return obj.task});
-  console.log(q1);
-  console.log(typeof qData);
-    //Must add logic to read filter out what is uncomplete, complete, or deleted by reading the propertys of the template
-};
+  extractJSON(data);
+}
 
 //Set values if a user is signed in
 (function profileTabUsername(){
@@ -139,14 +157,17 @@ function syncData(data){      //Just map everything into the template version of
   profileTab.setAttribute('data-profile','(Offline)');
   profileTab.setAttribute('href','/auth/google');
   }
-  let user = document.getElementsByTagName('meta')[3].content;
-  console.log(user);
-  let xhr = new XMLHttpRequest();
-  xhr.open('GET','http://127.0.0.1:9000/fetch', true);
-  fetch('http://127.0.0.1:9000/fetch')
-  .then(res => res.json())
-  .then(data => syncData(data))
+  let user = document.getElementsByTagName('meta')[3].content; //Check if user is signed in
+  if(user){;
+    //console.log('Fetching...');
+    let xhr = new XMLHttpRequest();
+    xhr.open('GET','http://127.0.0.1:9000/fetch', true);
+    fetch('http://127.0.0.1:9000/fetch')
+    .then(res => res.json())
+    .then(data => syncData(data));
+  };
 })();
+
 
 //Menu Event Listener
 document.getElementById('Menu').addEventListener('click', ()=>{
@@ -253,6 +274,7 @@ function submitItem(value,override){
         listItem(newItem);
         data.todo.push(newItem); //Push to data array
         addItemTodo(newItem,false,true);
+        post(newItem);
         document.getElementById('item').value = ''; //Clear input bar
         dataObjectUpdate();
       }
@@ -265,7 +287,7 @@ function submitItem(value,override){
 function renderList(renderView){
   unRenderList(); //Unrender anything present if present
   view = renderView;
-  console.log(`Currently viewing: ${view}`);
+  //console.log(`Currently viewing: ${view}`);
   switch (renderView){
     case viewings.TASKS:
     //Render uncomplete task
@@ -294,7 +316,7 @@ function renderList(renderView){
       }
       break;
     default: 
-    console.log(`Viewing: ${renderView} resulted in a error`);
+    //console.log(`Viewing: ${renderView} resulted in a error`);
   }
 };
 
@@ -305,7 +327,7 @@ function unRenderList(){
     for (let i = 0; i < items.length; i++){
       items[i].parentNode.removeChild(items[i]);
     }
-    console.log('Unrender done');
+    //console.log('Unrender done');
   };
 };
 
@@ -313,7 +335,7 @@ function unRenderList(){
 
 //Update Data
 function dataObjectUpdate(){
-  localStorage.setItem('todoList', JSON.stringify(data));
+ // localStorage.setItem('todoList', JSON.stringify(data));
   console.log(data);
 };
 
@@ -344,12 +366,6 @@ function post(obj) {
   xhr.send(formData);
   document.body.removeChild(form);
 }
-
-function test() {
-  let xhr = new XMLHttpRequest();
-  xhr.open('GET','http://127.0.0.1:9000/load');
-  xhr.send();
-};
 
 /////// ITEM MANIPULATION FUNCTIONS \\\\\\\
 
@@ -405,7 +421,7 @@ function addItemTodo(obj, completed, submit){
     item.setAttribute('title',`Deleted: ${obj.deletionDate}`);
       break;
   }
-  if(submit){post(obj);};
+  //if(submit){post(obj);};
 }
 
 //COMPLETE ITEM
