@@ -120,31 +120,23 @@ const sumbitCommand = (value)=>{
 }
 
 function extractJSON(dataArr){
-  console.log(dataArr.length);
-  for (let i = 0; i < dataArr.length; i++){
+  let arr = dataArr;
+  console.log(arr.length);
+  for (let i = 0; i < arr.length; i++){
     console.log(`At ${[i]}`);
-    if(dataArr[i].deletionDate){
-      console.log(`Task:${dataArr[i].task} = deleted`);
-      data.deleted.push(dataArr[i]);
-      return;
-    } else if (dataArr[i].completionDate){
-      console.log(`Task:${dataArr[i].task} = completed`);
-      data.completed.push(dataArr[i]);
-    } else {
-      console.log(`Task:${dataArr[i].task} = todo`);
-      data.todo.push(dataArr[i]);
+    if(arr[i].deletionDate){
+      //console.log(`Task:${arr[i].task} = deleted`);
+      data.deleted.push(arr[i]);
+    } else if (arr[i].completionDate){
+      //console.log(`Task:${arr[i].task} = completed`);
+      data.completed.push(arr[i]);
+    } else if (arr[i].creationDate){
+      //console.log(`Task:${arr[i].task} = todo`);
+      data.todo.push(arr[i]);
     }
     renderList(view);
   }
   console.log('Done');
-}
-
-function syncData(data){
-  console.log('Fetching...');
-  let qData = data;
-  console.log(qData);
-  let qTask = qData.map((obj)=>{return obj.task}); //The task it to be displayed/rendered
-  extractJSON(data);
 }
 
 //Set values if a user is signed in
@@ -158,16 +150,68 @@ function syncData(data){
   profileTab.setAttribute('href','/auth/google');
   }
   let user = document.getElementsByTagName('meta')[3].content; //Check if user is signed in
-  if(user){;
-    //console.log('Fetching...');
-    let xhr = new XMLHttpRequest();
-    xhr.open('GET','http://127.0.0.1:9000/fetch', true);
+  if(user){
     fetch('http://127.0.0.1:9000/fetch')
     .then(res => res.json())
-    .then(data => syncData(data));
+    .then(data => extractJSON(data));
   };
 })();
 
+/////// POST REQUEST \\\\\\\\
+
+function post(obj,index) {
+  let user = document.getElementsByTagName('meta')[3].content; //Check if user is signed in
+  if(!user){return};
+  let form = document.createElement("form");
+  form.setAttribute("method", 'post');
+  form.setAttribute("enctype", 'multipart/form-data"');
+  form.setAttribute("action", '/');
+
+  //Create temp form with obj data
+  for(let key in obj) {
+      if(obj.hasOwnProperty(key)) {
+          let hiddenField = document.createElement("input");
+          hiddenField.setAttribute("type", "text");
+          hiddenField.setAttribute("name", key);
+          hiddenField.setAttribute("value", obj[key]);
+
+          form.appendChild(hiddenField);
+      }
+  }
+  document.body.appendChild(form);  
+  let formData = new FormData(form);
+  let xhr = new XMLHttpRequest();
+  xhr.onreadystatechange = ()=>{
+    if(xhr.readyState == XMLHttpRequest.DONE){
+      data.todo[index]=JSON.parse(xhr.responseText)
+      console.log(data.todo[index]);
+    }
+  }
+  xhr.open('POST','http://127.0.0.1:9000/task');
+  //console.log(formData);
+  xhr.send(formData);
+  document.body.removeChild(form);
+}
+
+/////// UPDATE REQUEST \\\\\\\\
+
+function update(oldObj,newObj){
+  let oldItem = JSON.stringify(oldObj);
+  let newItem = JSON.stringify(newObj);
+  let sendItem = `[${oldItem},${newItem}]`;
+  let xhr = new XMLHttpRequest();
+  xhr.open('POST','http://127.0.0.1:9000/update');
+  xhr.send(sendItem);
+}
+
+/////// REMOVE REQUEST \\\\\\\\
+
+function remove(obj){
+  let removeItem = JSON.stringify(obj);
+  let xhr = new XMLHttpRequest();
+  xhr.open('POST','http://127.0.0.1:9000/remove');
+  xhr.send(removeItem);
+}
 
 //Menu Event Listener
 document.getElementById('Menu').addEventListener('click', ()=>{
@@ -274,7 +318,7 @@ function submitItem(value,override){
         listItem(newItem);
         data.todo.push(newItem); //Push to data array
         addItemTodo(newItem,false,true);
-        post(newItem);
+        post(newItem,data.todo.findIndex((item => item === newItem)));
         document.getElementById('item').value = ''; //Clear input bar
         dataObjectUpdate();
       }
@@ -338,34 +382,6 @@ function dataObjectUpdate(){
  // localStorage.setItem('todoList', JSON.stringify(data));
   console.log(data);
 };
-
-/////// POST REQUEST \\\\\\\\
-
-function post(obj) {
-  let form = document.createElement("form");
-  form.setAttribute("method", 'post');
-  form.setAttribute("enctype", 'multipart/form-data"');
-  form.setAttribute("action", '/');
-
-  //Create temp form with obj data
-  for(let key in obj) {
-      if(obj.hasOwnProperty(key)) {
-          let hiddenField = document.createElement("input");
-          hiddenField.setAttribute("type", "text");
-          hiddenField.setAttribute("name", key);
-          hiddenField.setAttribute("value", obj[key]);
-
-          form.appendChild(hiddenField);
-      }
-  }
-  document.body.appendChild(form);  
-  let formData = new FormData(form);
-  let xhr = new XMLHttpRequest();
-  xhr.open('POST','http://127.0.0.1:9000/task');
-  console.log(formData);
-  xhr.send(formData);
-  document.body.removeChild(form);
-}
 
 /////// ITEM MANIPULATION FUNCTIONS \\\\\\\
 
@@ -441,6 +457,7 @@ function completeItem(){
       itemIndex = data.todo.findIndex((item => item.task === itemValue));
       itemPush = data.todo[itemIndex];
       itemPush.completionDate = (new Date()).toLocaleDateString('en-US');
+      update(data.todo[itemIndex],itemPush);
       //Timestamp
       completedItem.setAttribute('title',`Made: ${itemPush.creationDate}\nDone: ${itemPush.completionDate}`);
       completedItem.setAttribute('data-date', itemPush.completionDate);
@@ -457,6 +474,7 @@ function completeItem(){
       itemIndex = data.completed.findIndex((item => item.task === itemValue));
       itemPush = data.completed[itemIndex];
       itemPush.completionDate = '';
+      update(data.completed[itemIndex],itemPush);
       //Timestamp
       completedItem.setAttribute('title',`Made: ${itemPush.creationDate}`);
       //Data manipulation
@@ -486,6 +504,7 @@ function removeItem(){
       itemIndex = data.todo.findIndex((item => item.task === itemValue));
       itemPush = data.todo[itemIndex];
       itemPush.deletionDate = (new Date()).toLocaleDateString('en-US');
+      update(data.todo[itemIndex],itemPush);
       //Set class and transfer data
       itemClass = 'deleted';
       data.todo.splice(itemIndex,1);
@@ -496,6 +515,7 @@ function removeItem(){
       itemIndex = data.completed.findIndex((item => item.task === itemValue));
       itemPush = data.completed[itemIndex];
       itemPush.deletionDate = (new Date()).toLocaleDateString('en-US');
+      update(data.completed[itemIndex],itemPush);
       //Set class and transfer data
       itemClass = 'deleted';
       data.completed.splice(itemIndex,1);
@@ -504,6 +524,7 @@ function removeItem(){
     case 'deleted':
       //Find and delete item
       itemIndex = data.deleted.findIndex((item => item.task === itemValue));
+      remove(data.deleted[itemIndex]);
       data.deleted.splice(itemIndex,1);
       break;
   }
