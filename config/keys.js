@@ -9,5 +9,6 @@ module.exports = {
     },
     session:{
         cookieKey:'Scoobydubidubisnakson420holidaze'
-    }
+    },
+    absoluteURL: ''
 };

@@ -11,9 +11,11 @@ const multiparty = require('multiparty');
 //App
 const app = express();
 const port = process.env.PORT || 9000;
+keys.absoluteURL = (port === 9000) ? 'localhost:9000' : 'https://mytask-tasklist-app.herokuapp.com';
 
 app.set('view engine','ejs');
 
+console.log(keys.absoluteURL);
 //Static Files Route
 app.use('/resources',express.static('resources'))
 

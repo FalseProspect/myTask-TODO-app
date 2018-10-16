@@ -9,7 +9,7 @@ let xhr = new XMLHttpRequest();
 
 // Local Storage
   //Todo List Data
-  let data = (localStorage.getItem('todoList')) ? JSON.parse(localStorage.getItem('todoList')) : {
+  let data = (localStorage.getItem('todoList') && !userClient) ? JSON.parse(localStorage.getItem('todoList')) : {
   todo: [],
   completed: [],
   deleted: []
@@ -369,7 +369,7 @@ function unRenderList(){
 
 //Update Data
 function dataObjectUpdate(){
- // localStorage.setItem('todoList', JSON.stringify(data));
+  localStorage.setItem('todoList', JSON.stringify(data));
   console.log(data);
 };
 
