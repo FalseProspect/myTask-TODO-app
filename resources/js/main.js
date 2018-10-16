@@ -4,6 +4,8 @@
 
 //Client Username
 let username = '';
+let userClient = document.getElementsByTagName('meta')[3].content; //Check if user is signed in
+let xhr = new XMLHttpRequest();  
 
 // Local Storage
   //Todo List Data
@@ -121,9 +123,7 @@ const sumbitCommand = (value)=>{
 
 function extractJSON(dataArr){
   let arr = dataArr;
-  console.log(arr.length);
   for (let i = 0; i < arr.length; i++){
-    console.log(`At ${[i]}`);
     if(arr[i].deletionDate){
       //console.log(`Task:${arr[i].task} = deleted`);
       data.deleted.push(arr[i]);
@@ -136,11 +136,11 @@ function extractJSON(dataArr){
     }
     renderList(view);
   }
-  console.log('Done');
 }
 
 //Set values if a user is signed in
 (function profileTabUsername(){
+  //Setup user's Profile Tab
   let profileTab = document.getElementById('profile');
   if(profileTab.innerText !== "Sign-In"){
     profileTab.setAttribute('data-profile',' ');
@@ -149,8 +149,8 @@ function extractJSON(dataArr){
   profileTab.setAttribute('data-profile','(Offline)');
   profileTab.setAttribute('href','/auth/google');
   }
-  let user = document.getElementsByTagName('meta')[3].content; //Check if user is signed in
-  if(user){
+  //If user is signed in, fetch their tasks
+  if(userClient){
     fetch('http://127.0.0.1:9000/fetch')
     .then(res => res.json())
     .then(data => extractJSON(data));
@@ -160,57 +160,47 @@ function extractJSON(dataArr){
 /////// POST REQUEST \\\\\\\\
 
 function post(obj,index) {
-  let user = document.getElementsByTagName('meta')[3].content; //Check if user is signed in
-  if(!user){return};
-  let form = document.createElement("form");
+  if(!userClient){return};                                                                    //Returns if user is not signed in
+  let form = document.createElement("form");                                                  //Temp form is made
   form.setAttribute("method", 'post');
-  form.setAttribute("enctype", 'multipart/form-data"');
+  form.setAttribute("enctype", 'multipart/form-data"');                                       //Encrypted to be parsed by multiparty
   form.setAttribute("action", '/');
 
-  //Create temp form with obj data
   for(let key in obj) {
       if(obj.hasOwnProperty(key)) {
           let hiddenField = document.createElement("input");
           hiddenField.setAttribute("type", "text");
           hiddenField.setAttribute("name", key);
           hiddenField.setAttribute("value", obj[key]);
-
           form.appendChild(hiddenField);
       }
   }
   document.body.appendChild(form);  
-  let formData = new FormData(form);
-  let xhr = new XMLHttpRequest();
+  let formData = new FormData(form);                                                          //Convert to FormData
   xhr.onreadystatechange = ()=>{
-    if(xhr.readyState == XMLHttpRequest.DONE){
-      data.todo[index]=JSON.parse(xhr.responseText)
-      console.log(data.todo[index]);
-    }
+    if(xhr.readyState == XMLHttpRequest.DONE){data.todo[index]=JSON.parse(xhr.responseText)}  //Receives the saved DB model to replace temp object 
   }
-  xhr.open('POST','http://127.0.0.1:9000/task');
-  //console.log(formData);
-  xhr.send(formData);
-  document.body.removeChild(form);
+  xhr.open('POST','http://127.0.0.1:9000/task');                                              //Open XHR Socket
+  xhr.send(formData);                                                                         //Send FormData to Node
+  document.body.removeChild(form);                                                            //Removes the temp form from html
 }
 
 /////// UPDATE REQUEST \\\\\\\\
 
-function update(oldObj,newObj){
-  let oldItem = JSON.stringify(oldObj);
-  let newItem = JSON.stringify(newObj);
-  let sendItem = `[${oldItem},${newItem}]`;
-  let xhr = new XMLHttpRequest();
-  xhr.open('POST','http://127.0.0.1:9000/update');
-  xhr.send(sendItem);
+function update(oldObj,newObj){                                                               //Receives the Old Model and New Model
+  let oldItem = JSON.stringify(oldObj);                                                       //Stringify Old Model
+  let newItem = JSON.stringify(newObj);                                                       //Stringify New Model
+  let sendItem = `[${oldItem},${newItem}]`;                                                   //Appends into single array with two objects                                                           
+  xhr.open('POST','http://127.0.0.1:9000/update');                                            //Open XHR Socket
+  xhr.send(sendItem);                                                                         //Send to Node
 }
 
 /////// REMOVE REQUEST \\\\\\\\
 
 function remove(obj){
-  let removeItem = JSON.stringify(obj);
-  let xhr = new XMLHttpRequest();
-  xhr.open('POST','http://127.0.0.1:9000/remove');
-  xhr.send(removeItem);
+  let removeItem = JSON.stringify(obj);                                                       //Stringify Target Model
+  xhr.open('POST','http://127.0.0.1:9000/remove');                                            //Open Socket
+  xhr.send(removeItem);                                                                       //Send to Node
 }
 
 //Menu Event Listener

@@ -394,7 +394,9 @@ ul.todoList#todo:after{
 }
 
 .menu a#profile{
-  padding: 1.3em 0 0 0;
+  padding: 1.35em 0 0 0;
+  position: absolute;
+  bottom: 100px;
 }
 
 .menu a#profile::after{

@@ -127,7 +127,7 @@ app.post('/task', (req,res) =>{
                     deletionDate: newTask.deletionDate[0]
                 });
                 let task = await Task.findOne(newData);
-                console.log(task);
+                console.log(`User:${req.user._id} created a new task`);
                 res.writeHead(200, {'Content-Type': 'text/plain'});
                 res.end(JSON.stringify(task));
                 return;
