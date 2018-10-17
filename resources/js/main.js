@@ -6,6 +6,7 @@
 let username = '';
 let userClient = document.getElementsByTagName('meta')[3].content; //Check if user is signed in
 let xhr = new XMLHttpRequest();  
+xhr.withCredentials = true;
 
 // Local Storage
   //Todo List Data
