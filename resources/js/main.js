@@ -121,22 +121,7 @@ const sumbitCommand = (value)=>{
   }
 }
 
-function extractJSON(dataArr){
-  let arr = dataArr;
-  for (let i = 0; i < arr.length; i++){
-    if(arr[i].deletionDate){
-      //console.log(`Task:${arr[i].task} = deleted`);
-      data.deleted.push(arr[i]);
-    } else if (arr[i].completionDate){
-      //console.log(`Task:${arr[i].task} = completed`);
-      data.completed.push(arr[i]);
-    } else if (arr[i].creationDate){
-      //console.log(`Task:${arr[i].task} = todo`);
-      data.todo.push(arr[i]);
-    }
-    renderList(view);
-  }
-}
+/////// CHECK USER SIGN IN \\\\\\\\
 
 //Set values if a user is signed in
 (function profileTabUsername(){
@@ -151,11 +136,32 @@ function extractJSON(dataArr){
   }
   //If user is signed in, fetch their tasks
   if(userClient){
-    fetch('http://127.0.0.1:9000/fetch')
+    fetch('http://127.0.0.1:9000/fetch',{
+      method: "GET",
+      credentials: 'include' })
     .then(res => res.json())
-    .then(data => extractJSON(data));
+    .then(data => extractJSON(data)).catch(err => console.log(err));
   };
 })();
+
+/////// FETCHED JSON PRINTING \\\\\\\\
+
+function extractJSON(dataArr){
+  let arr = dataArr;
+  for (let i in arr){
+    if(arr[i].deletionDate){
+      //console.log(`Task:${arr[i].task} = deleted`);
+      data.deleted.push(arr[i]);
+    } else if (arr[i].completionDate){
+      //console.log(`Task:${arr[i].task} = completed`);
+      data.completed.push(arr[i]);
+    } else if (arr[i].creationDate){
+      //console.log(`Task:${arr[i].task} = todo`);
+      data.todo.push(arr[i]);
+    }
+    renderList(view);
+  }
+}
 
 /////// POST REQUEST \\\\\\\\
 
@@ -188,6 +194,7 @@ function post(obj,index) {
 /////// UPDATE REQUEST \\\\\\\\
 
 function update(oldObj,newObj){                                                               //Receives the Old Model and New Model
+  if(!userClient){return};
   let oldItem = JSON.stringify(oldObj);                                                       //Stringify Old Model
   let newItem = JSON.stringify(newObj);                                                       //Stringify New Model
   let sendItem = `[${oldItem},${newItem}]`;                                                   //Appends into single array with two objects                                                           
@@ -198,10 +205,13 @@ function update(oldObj,newObj){                                                 
 /////// REMOVE REQUEST \\\\\\\\
 
 function remove(obj){
+  if(!userClient){return};
   let removeItem = JSON.stringify(obj);                                                       //Stringify Target Model
   xhr.open('POST','http://127.0.0.1:9000/remove');                                            //Open Socket
   xhr.send(removeItem);                                                                       //Send to Node
 }
+
+/////// USER INTERFACE FUNCTIONS \\\\\\\\
 
 //Menu Event Listener
 document.getElementById('Menu').addEventListener('click', ()=>{
@@ -215,18 +225,15 @@ function menuClickEvent(value){
   localStorage.setItem('menuOpen', JSON.stringify(value));
 };
 
-
 //Theme change click event
 document.getElementById('theme').addEventListener('click', function(){
   themeIndex !== themes.length - 1 ? themeIndex ++ : themeIndex = 0; 
-  //console.log(themeIndex);
   themeSwitch(themeIndex);
 });
 
 //Theme Switcher
 function themeSwitch(index){
   let theme = themes[index];
-  //console.log(`Theme: ${theme.name}`);
   document.getElementById('themeLabel').innerHTML =`Theme: ${theme.name}`;
   document.documentElement.style.setProperty('--mainAccent', theme.mainColor);
   localStorage.setItem('themeIndex', JSON.stringify(index));
@@ -271,7 +278,6 @@ document.getElementById('item').focus();
 //Add button pressed
 document.getElementById('add').addEventListener('click', function(){
   let value = document.getElementById('item').value;
-  //Get text in input field if any
   if(value){submitItem(value);}
 });
 
@@ -327,24 +333,24 @@ function renderList(renderView){
     //Render uncomplete task
       
       if (!data.todo.length && !data.completed.length) return;
-      for (let i = 0; i < data.todo.length; i++){
+      for (let i in data.todo){
         let value = data.todo[i];
         addItemTodo(value, false);
       }
       //render complete task
-      for (let i = 0; i < data.completed.length; i++){
+      for (let i in data.completed){
         let value = data.completed[i];
         addItemTodo(value, true);
       }
       break;
     case viewings.DELETED:
-      for (let i = 0; i < data.deleted.length; i++){
+      for (let i in data.deleted){
         let value = data.deleted[i];
         addItemTodo(value, false);
       }
       break;
     case viewings.DONE_TASKS:
-      for (let i = 0; i < data.completed.length; i++){
+      for (let i in data.completed){
         let value = data.completed[i];
         addItemTodo(value, true);
       }
@@ -361,7 +367,6 @@ function unRenderList(){
     for (let i = 0; i < items.length; i++){
       items[i].parentNode.removeChild(items[i]);
     }
-    //console.log('Unrender done');
   };
 };
 
@@ -376,7 +381,7 @@ function dataObjectUpdate(){
 /////// ITEM MANIPULATION FUNCTIONS \\\\\\\
 
 //Add todo item
-function addItemTodo(obj, completed, submit){
+function addItemTodo(obj, completed){
   //Decide which list to add to
   let list = (completed) ? document.getElementById('completed') : document.getElementById('todo');
   //Create list elem and add text
@@ -427,7 +432,6 @@ function addItemTodo(obj, completed, submit){
     item.setAttribute('title',`Deleted: ${obj.deletionDate}`);
       break;
   }
-  //if(submit){post(obj);};
 }
 
 //COMPLETE ITEM

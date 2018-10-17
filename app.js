@@ -12,10 +12,11 @@ const multiparty = require('multiparty');
 const app = express();
 const port = process.env.PORT || 9000;
 keys.absoluteURL = (port === 9000) ? 'localhost:9000' : 'https://mytask-tasklist-app.herokuapp.com';
+console.log(keys.absoluteURL);
 
+//View Engine
 app.set('view engine','ejs');
 
-console.log(keys.absoluteURL);
 //Static Files Route
 app.use('/resources',express.static('resources'))
 
@@ -50,7 +51,7 @@ app.get('/0', async (req,res) =>{
     }
     console.log(`${req.user.username} has signed in with Address:${req.connection.remoteAddress}`);
     const tasks = await Task.find({owner: req.user._id});
-    //console.log(tasks);
+    //console.log(req.session);
     res.render('index',{user: req.user, tasks: tasks.map(obj=>obj.task)});
 });
 
@@ -60,18 +61,12 @@ app.get('/fetch', async (req,res)=>{
     if(req.user){
         console.log(`User:${req.user._id} called fetch request with Address:${req.connection.remoteAddress}`);
         const tasks = await Task.find({owner: req.user._id});
-        res.writeHead(200, {'Content-Type': 'application/json'});
+        res.writeHead(200, {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Credentials': true,
+        'Access-Control-Allow-Origin': `http://localhost:${port}`          //Resolves issue running from localhost instead of 127.0.0.1
+    });
         res.end(JSON.stringify(tasks));
-    };
-});
-
-//Sync Post
-app.get('/sync', async (req,res)=>{
-    if(req.user){
-        console.log(`User:${req.user._id} created new sync request with Address:${req.connection.remoteAddress}`);
-        let task = await Task.findOne({owner: req.user._id});
-        res.writeHead(200, {'Content-Type': 'application/json'});
-        res.end(JSON.stringify(task));
     };
 });
 
