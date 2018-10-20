@@ -8,9 +8,9 @@ router.get('/login',(req,res)=>{
 
 //Auth Logout
 router.get('/logout',(req,res)=>{
-    //Passport handle
-    req.logout();
-    res.redirect('/');
+  req.session.destroy(function (err) {
+    res.redirect('/'); //Inside a callback… bulletproof!
+  });
 });
 
 //Auth with Google
