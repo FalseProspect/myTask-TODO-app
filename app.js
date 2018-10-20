@@ -5,13 +5,13 @@ const cookieSession = require('cookie-session');
 const keys          = require('./config/keys');
 const authRoutes    = require('./routes/auth-routes');
 const passportSetup = require('./config/passport-setup');
-const Task = require('./models/task-model');
-const multiparty = require('multiparty');
+const Task          = require('./models/task-model');
+const multiparty    = require('multiparty');
 
 //App
 const app = express();
 const port = process.env.PORT || 9000;
-keys.absoluteURL = 'http://myday.falseprospect.com';
+keys.absoluteURL = 'http://mytask.falseprospect.com';
 
 //View Engine
 app.set('view engine','ejs');
