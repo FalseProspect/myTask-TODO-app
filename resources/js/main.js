@@ -138,9 +138,7 @@ const sumbitCommand = (value)=>{
   }
   //If user is signed in, fetch their tasks
   if(userClient){
-    fetch(`${url}/fetch`,{
-      method: "GET",
-      credentials: 'include' })
+    fetch(`${url}/fetch`)
     .then(res => res.json())
     .then(data => extractJSON(data)).catch(err => console.log(err));
   };
