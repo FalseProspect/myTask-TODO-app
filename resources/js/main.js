@@ -48,10 +48,10 @@ const theme = function(themeName,mainColor){
 };
 const themes = [
   new theme('Honey','RGBA(243,167,18,1)'),    // #F3A712 RGBA(243,167,18,1)
-  new theme('Royal','RGBA(70,35,122,1)'),     // #46237a RGBA(70,35,122,1)
+  new theme('Royal','RGBA(90,45,158,1)'),     // #5A2D9E RGBA(90,45,158,1)
   new theme('Ocean','RGBA(69,74,222,1)'),     // #454ADE RGBA(69,74,222,1)
   new theme('Pumpkin','RGBA(255,78,0,1)'),    // #FF4E00 RGBA(255,78,0,1)
-  new theme('Rum','RGBA(80,31,50,1)'),        // #501F32 RGBA(80,31,50,1)
+  new theme('Rum','RGBA(99,21,51,1)'),        // #631533 RGBA(99,21,51,1)
   new theme('Sky', 'skyblue'),
   new theme('Salmon','RGBA(255,113,91,1)'),   // #FF715B RGBA(255,113,91,1)
   new theme('Mint','RGBA(37,185,154,1)')];    // #25B99A RGBA(37,185,154,1)
@@ -433,6 +433,7 @@ function addItemTodo(obj, completed){
     item.setAttribute('title',`Deleted: ${obj.deletionDate}`);
       break;
   }
+  item.setAttribute('draggable', 'true');
 }
 
 //COMPLETE ITEM
@@ -525,3 +526,117 @@ function removeItem(){
   }
   dataObjectUpdate();
 }
+
+/////// LIST ITEM REORDERING \\\\\\\
+
+let dragSrcEl = null;
+let draggingIndex = undefined;
+let dropIndex = undefined;
+function handleDragStart(e) {
+  dragSrcEl = this;
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/html', this.outerHTML);
+
+  switch(this.getAttribute("class")){
+    case 'uncomplete':
+      draggingIndex = data.todo.findIndex((item => item.uID === this.getAttribute('data-dateid')));
+      break;
+    case 'complete':
+      draggingIndex = data.completed.findIndex((item => item.uID === this.getAttribute('data-dateid')));
+      break;
+    case 'deleted':
+      draggingIndex = data.deleted.findIndex((item => item.uID === this.getAttribute('data-dateid')));
+      break;
+  };
+  console.log(`Dragging Index: ${draggingIndex}`);
+  this.classList.add('dragElem');
+}
+function handleDragOver(e) {
+  if (e.preventDefault) {
+    e.preventDefault(); // Necessary. Allows us to drop.
+  }
+  this.classList.add('over');
+  e.dataTransfer.dropEffect = 'move';                           // See the section on the DataTransfer object.
+  return false;
+}
+
+function handleDragEnter(e) {}                                  // this / e.target is the current hover target.
+
+function handleDragLeave(e) {this.classList.remove('over')}     // this / e.target is previous target element.
+
+function handleDrop(e) {
+  if (e.stopPropagation) {e.stopPropagation()}                  // Stops some browsers from redirecting.
+  
+  // Don't do anything if dropping the same column we're dragging.
+  if (dragSrcEl != this) {
+    let itemClass = this.getAttribute("class").split(' ')[0];
+    switch(itemClass){
+      case 'uncomplete':
+        dropIndex = data.todo.findIndex((item => item.uID === this.getAttribute('data-dateid')));
+        break;
+      case 'complete':
+        dropIndex = data.completed.findIndex((item => item.uID === this.getAttribute('data-dateid')));
+        break;
+      case 'deleted':
+        dropIndex = data.deleted.findIndex((item => item.uID === this.getAttribute('data-dateid')));
+        break;
+    };
+    console.log(`Dropping in to index pos: ${dropIndex - 1}`);
+    reorderList(draggingIndex,dropIndex, itemClass);
+    this.parentNode.removeChild(dragSrcEl);
+    var dropHTML = e.dataTransfer.getData('text/html');
+    this.insertAdjacentHTML('beforebegin',dropHTML);
+    var dropElem = this.previousSibling;
+    addDnDHandlers(dropElem);
+  }
+  this.classList.remove('over');
+  return false;
+}
+
+function reorderList(pos1,pos2,listClass){
+  let index1 = pos1;
+  let index2 = pos2 - 1;
+  let list = listClass;
+  let data1;
+  let data2;
+  switch(list){
+    case 'uncomplete':
+      data1 = data.todo[index1];
+      data2 = data.todo[index2];
+      console.log(`Data 1: ${data1}`);      
+      console.log(`Data 2: ${data2}`);
+      data.todo[index2] = data1;
+      data.todo[index1] = data2;
+      break;
+    case 'complete':
+      data1 = data.todo[index1];
+      data2 = data.todo[index2];
+      data.completed[index2] = data1;
+      data.completed[index1] = data2;
+      break;
+    case 'deleted':
+      data1 = data.todo[index1];
+      data2 = data.todo[index2];
+      data.deleted[index2] = data1;
+      data.deleted[index1] = data2;
+      break;
+  };
+  dataObjectUpdate();
+}
+
+function handleDragEnd(e) {
+  // this/e.target is the source node.
+  this.classList.remove('over');
+}
+
+function addDnDHandlers(elem) {
+  elem.addEventListener('dragstart', handleDragStart, false);
+  elem.addEventListener('dragenter', handleDragEnter, false)
+  elem.addEventListener('dragover', handleDragOver, false);
+  elem.addEventListener('dragleave', handleDragLeave, false);
+  elem.addEventListener('drop', handleDrop, false);
+  elem.addEventListener('dragend', handleDragEnd, false);
+}
+
+let cols = document.querySelectorAll('ul.todoList li');
+[].forEach.call(cols, addDnDHandlers);

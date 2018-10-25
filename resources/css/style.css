@@ -420,7 +420,60 @@ ul.todoList li.deleted .buttons button.remove{
   margin-left: 25%;
 }
 
+ul.todoList li.over {
+  border-top: 4px solid var(--mainAccent);
+}
+
 #user{
   position: absolute;
   visibility: hidden;
+}
+
+@media screen and (max-width: 800px){
+  body{
+    padding: 60px 0 0 0;
+  }
+  header{
+    height: 60px;
+    padding: 8px;
+  }
+  header input{
+    height: 40px;
+    padding: 0 20px 0 0;
+  }
+  header button{
+    width: 40px;
+    height: 40px;
+    top: 7.5px;
+    right: 7.5px;
+  }
+  header button#Menu{
+    top: 5px;
+  }
+  header button#logo{
+    top: 5px;
+  }
+  .menu a{
+    width: 170px;
+    height: 3.5em;
+    padding: 1.2em 0 0 0;
+  }
+  .menu a svg{
+    width: 25px;
+    height: 25px;
+    position: absolute;
+    top: 43%;
+    left: 10%;
+    margin: -8px 0 0 -8px;
+  }
+  .menu a#profile{
+    padding: 1em 0 0 0;
+  }
+  .menu a#profile::after{
+    position:absolute;
+    left: 37%;
+    font-size: .8rem;
+    bottom: .55em;
+    content: attr(data-profile);
+  }
 }
