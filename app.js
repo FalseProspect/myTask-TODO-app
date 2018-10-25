@@ -5,14 +5,13 @@ const cookieSession = require('cookie-session');
 const keys          = require('./config/keys');
 const authRoutes    = require('./routes/auth-routes');
 const passportSetup = require('./config/passport-setup');
-const Task = require('./models/task-model');
-const multiparty = require('multiparty');
+const Task          = require('./models/task-model');
+const multiparty    = require('multiparty');
 
 //App
 const app = express();
 const port = process.env.PORT || 9000;
-keys.absoluteURL = (port === 9000) ? 'localhost:9000' : 'https://mytask-tasklist-app.herokuapp.com';
-console.log(keys.absoluteURL);
+keys.absoluteURL = 'http://mytask.falseprospect.com';
 
 //View Engine
 app.set('view engine','ejs');
@@ -63,8 +62,7 @@ app.get('/fetch', async (req,res)=>{
         const tasks = await Task.find({owner: req.user._id});
         res.writeHead(200, {
         'Content-Type': 'application/json',
-        'Access-Control-Allow-Credentials': true,
-        'Access-Control-Allow-Origin': `http://localhost:${port}`          //Resolves issue running from localhost instead of 127.0.0.1
+        'Access-Control-Allow-Credentials': true
     });
         res.end(JSON.stringify(tasks));
     };

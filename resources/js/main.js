@@ -7,6 +7,7 @@ let username = '';
 let userClient = document.getElementsByTagName('meta')[3].content; //Check if user is signed in
 let xhr = new XMLHttpRequest();  
 xhr.withCredentials = true;
+let url = `${location.protocol}//${location.host}`;
 
 // Local Storage
   //Todo List Data
@@ -137,9 +138,7 @@ const sumbitCommand = (value)=>{
   }
   //If user is signed in, fetch their tasks
   if(userClient){
-    fetch('http://127.0.0.1:9000/fetch',{
-      method: "GET",
-      credentials: 'include' })
+    fetch(`${url}/fetch`)
     .then(res => res.json())
     .then(data => extractJSON(data)).catch(err => console.log(err));
   };
@@ -187,7 +186,7 @@ function post(obj,index) {
   xhr.onreadystatechange = ()=>{
     if(xhr.readyState == XMLHttpRequest.DONE){data.todo[index]=JSON.parse(xhr.responseText)}  //Receives the saved DB model to replace temp object 
   }
-  xhr.open('POST','http://127.0.0.1:9000/task');                                              //Open XHR Socket
+  xhr.open('POST',`${url}/task`);                                              //Open XHR Socket
   xhr.send(formData);                                                                         //Send FormData to Node
   document.body.removeChild(form);                                                            //Removes the temp form from html
 }
@@ -199,7 +198,7 @@ function update(oldObj,newObj){                                                 
   let oldItem = JSON.stringify(oldObj);                                                       //Stringify Old Model
   let newItem = JSON.stringify(newObj);                                                       //Stringify New Model
   let sendItem = `[${oldItem},${newItem}]`;                                                   //Appends into single array with two objects                                                           
-  xhr.open('POST','http://127.0.0.1:9000/update');                                            //Open XHR Socket
+  xhr.open('POST',`${url}/update`);                                            //Open XHR Socket
   xhr.send(sendItem);                                                                         //Send to Node
 }
 
@@ -208,7 +207,7 @@ function update(oldObj,newObj){                                                 
 function remove(obj){
   if(!userClient){return};
   let removeItem = JSON.stringify(obj);                                                       //Stringify Target Model
-  xhr.open('POST','http://127.0.0.1:9000/remove');                                            //Open Socket
+  xhr.open('POST',`${url}/remove`);                                            //Open Socket
   xhr.send(removeItem);                                                                       //Send to Node
 }
 
