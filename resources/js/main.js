@@ -17,7 +17,6 @@ let url = `${location.protocol}//${location.host}`;
   deleted: []
   };
 
-  
   // Theme Index
   let themeIndex = (localStorage.getItem('themeIndex')) ? JSON.parse(localStorage.getItem('themeIndex')) : 0 ;
 
@@ -41,6 +40,9 @@ const viewings = {
 
 //Initiate starting view
 let view = viewings.TASKS;
+
+//Active Elements
+let isInputActive;
 
 //Themes
 const theme = function(themeName,mainColor){
@@ -132,9 +134,13 @@ const sumbitCommand = (value)=>{
   if(profileTab.innerText !== "Sign-In"){
     profileTab.setAttribute('data-profile',' ');
     profileTab.setAttribute('href','/auth/logout');
+    document.getElementById('clientStatus').style.background = 'var(--mainAccent)';
+    document.getElementById('clientStatus').innerText = 'Online';
   }else{
-  profileTab.setAttribute('data-profile','(Offline)');
-  profileTab.setAttribute('href','/auth/google');
+    profileTab.setAttribute('data-profile','(Offline)');
+    profileTab.setAttribute('href','/auth/google');
+    document.getElementById('clientStatus').style.background = '#444';
+    document.getElementById('clientStatus').innerText = 'Offline';
   }
   //If user is signed in, fetch their tasks
   if(userClient){
@@ -219,9 +225,10 @@ document.getElementById('Menu').addEventListener('click', ()=>{
   menuClickEvent(menuOpen)});
 
 function menuClickEvent(value){
-  document.getElementById('itemBin').style.marginLeft = value === true ? '200px': '0';
-  document.getElementById('sideMenu').style.transform = value === true ? 'translateX(0px)': 'translateX(-200px)';
-  document.getElementById('itemBin').style.width = value === true ? 'calc(100% - 200px)': '100%';
+  document.getElementById('itemBin').style.marginLeft = menuOpen ? '0' : '160px';
+  document.getElementById('sideMenu').style.transform = menuOpen ? 'translateX(-200px)' : 'translateX(0px)';
+  document.getElementById('itemBin').style.width = menuOpen ? '100%' : 'calc(100% - 160px)';
+  document.getElementById('clientStatus').style.marginLeft = menuOpen ? '0' : '160px';
   localStorage.setItem('menuOpen', JSON.stringify(value));
 };
 
@@ -278,14 +285,40 @@ document.getElementById('item').focus();
 //Add button pressed
 document.getElementById('add').addEventListener('click', function(){
   let value = document.getElementById('item').value;
-  if(value){submitItem(value);}
+  if(value){submitItem(value)}
 });
+
+//Header Logo and input bar transitions
+function headerStyling(){
+  document.getElementById('item').style.marginLeft = (isInputActive) ? '55px': '200px';
+  document.getElementById('item').style.width = (isInputActive) ? 'calc(100% - 55px)': 'calc(100% - 200px)';
+  document.getElementById('logo').style.width = (isInputActive) ? '0px': '140px';  
+  document.getElementById('logoSvg').style.width = (isInputActive) ? '0px': '140px';    
+}
+
+//Track click focus changes
+document.body.addEventListener('click',()=>{
+  if(document.activeElement !== document.getElementById('item')){
+    isInputActive = false;
+    headerStyling();
+    console.log('Input bar in not active')}
+})
 
 //'Enter' press = submit
 document.getElementById('item').addEventListener('keydown',function (e) {
   let value = document.getElementById('item').value;
-  if (e.key === "Enter" && value) {submitItem(value);}
-  });
+  if (e.key === "Enter" && value) {submitItem(value)};
+  if (document.activeElement === this){
+    switch(e.key){
+      case "ArrowUp":
+        cycleInputHistory('UP');
+        break;
+      case "ArrowDown":
+        cycleInputHistory('DOWN');
+      break;
+    }
+
+  }});
 
 //Toggle CommandMode
 function toggleCommandMode(status) {
@@ -294,7 +327,24 @@ function toggleCommandMode(status) {
   document.getElementById('item').value = '';
 }
 
+//Store input history to be recalled again (Like command prompt)
+let inputHistory = [];
+let inputHistoryIndex = -1;
 
+function cycleInputHistory(direction){
+  switch(direction){
+    case "UP":
+      if(!inputHistory[inputHistoryIndex + 1]){return};
+      inputHistoryIndex ++;
+      break;
+    case "DOWN":
+      if(!inputHistory[inputHistoryIndex - 1] && inputHistoryIndex - 1 !== -1){return};
+      inputHistoryIndex --;
+      break;
+  }
+  if(inputHistory[inputHistoryIndex] === undefined){return document.getElementById('item').value = ''};
+  document.getElementById('item').value = inputHistory[inputHistoryIndex];
+}
 
 //Submit item
 function submitItem(value,override){
