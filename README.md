@@ -1,5 +1,6 @@
 # myTask-TODO-app
 Website:
+
 myTask.falseprospect.com
 
 Decription:
@@ -12,7 +13,9 @@ Features:
 - Synchronize your task across all your web accessable devices
 
 Instructions:
+
 (Online)
+
 Please visit myTask.falseprospect.com
 
 (Offline)
