@@ -55,7 +55,9 @@ const themes = [
   new theme('Ocean','RGBA(69,74,222,1)'),     // #454ADE RGBA(69,74,222,1)
   new theme('Pumpkin','RGBA(255,78,0,1)'),    // #FF4E00 RGBA(255,78,0,1)
   new theme('Rum','RGBA(99,21,51,1)'),        // #631533 RGBA(99,21,51,1)
-  new theme('Sky', 'skyblue'),
+  new theme('Sky', 'skyblue'),                
+  new theme('Witch','#4b367c'),               
+  new theme('Tiffany','#00DFE1'),                         
   new theme('Salmon','RGBA(255,113,91,1)'),   // #FF715B RGBA(255,113,91,1)
   new theme('Mint','RGBA(37,185,154,1)')];    // #25B99A RGBA(37,185,154,1)
 
@@ -80,57 +82,14 @@ setNightMode(nightMode);
 //Menu Status
 menuClickEvent(menuOpen);
 
-//Command Mode (Debug Mode)
-//Command Variable
-let cmdMode = false;
 
-//Sumbit Command
-const sumbitCommand = (value)=>{
-  let command = value.split(' ')
-  let aurgument = command.slice(1,).join(' ');
-  document.getElementById('item').value = ''; //Clear input bar
-  //console.log(aurgument);
-  switch(command[0]){
-    case 'theme':
-      themeSwitch(aurgument);
-      break;
-    case 'cmd':
-      toggleCommandMode(JSON.parse(aurgument));
-      break;
-    case 'night':
-      setNightMode(JSON.parse(aurgument));
-      break;
-    case 'unrender':
-    case 'ur-':
-      unRenderList();
-      break;
-    case 'render':
-    case 'r-':
-      renderList(aurgument);
-      break;
-    case 'clear':
-    case 'c-':
-      localStorage.clear();
-      break;
-    case 'view':
-    case 'v-':
-      console.log(view);
-      break;
-    case 'newItem':
-    case 'ni-':
-      submitItem(aurgument,true);
-      break;
-    default:
-      console.log(`"${command[0]}" command not recognized`);
-  }
-}
 
-/////// CHECK USER SIGN IN \\\\\\\\
+//HTML REQUEST \\\\\\\\
 
 //Set values if a user is signed in
 (function profileTabUsername(){
   //Setup user's Profile Tab
-  let profileTab = document.getElementById('profile');
+  let profileTab = document.getElementById('profileLabel');
   if(profileTab.innerText !== "Sign-In"){
     profileTab.setAttribute('data-profile',' ');
     profileTab.setAttribute('href','/auth/logout');
@@ -150,8 +109,7 @@ const sumbitCommand = (value)=>{
   };
 })();
 
-/////// FETCHED JSON PRINTING \\\\\\\\
-
+//FETCHED JSON PRINTING
 function extractJSON(dataArr){
   let arr = dataArr;
   for (let i in arr){
@@ -169,8 +127,7 @@ function extractJSON(dataArr){
   }
 }
 
-/////// POST REQUEST \\\\\\\\
-
+//POST REQUEST
 function post(obj,index) {
   if(!userClient){return};                                                                    //Returns if user is not signed in
   let form = document.createElement("form");                                                  //Temp form is made
@@ -197,8 +154,7 @@ function post(obj,index) {
   document.body.removeChild(form);                                                            //Removes the temp form from html
 }
 
-/////// UPDATE REQUEST \\\\\\\\
-
+// UPDATE REQUEST
 function update(oldObj,newObj){                                                               //Receives the Old Model and New Model
   if(!userClient){return};
   let oldItem = JSON.stringify(oldObj);                                                       //Stringify Old Model
@@ -208,8 +164,7 @@ function update(oldObj,newObj){                                                 
   xhr.send(sendItem);                                                                         //Send to Node
 }
 
-/////// REMOVE REQUEST \\\\\\\\
-
+// REMOVE REQUEST
 function remove(obj){
   if(!userClient){return};
   let removeItem = JSON.stringify(obj);                                                       //Stringify Target Model
@@ -217,134 +172,7 @@ function remove(obj){
   xhr.send(removeItem);                                                                       //Send to Node
 }
 
-/////// USER INTERFACE FUNCTIONS \\\\\\\\
 
-//Menu Event Listener
-document.getElementById('Menu').addEventListener('click', ()=>{
-  menuOpen = !menuOpen;
-  menuClickEvent(menuOpen)});
-
-function menuClickEvent(value){
-  document.getElementById('itemBin').style.marginLeft = menuOpen ? '0' : '160px';
-  document.getElementById('sideMenu').style.transform = menuOpen ? 'translateX(-200px)' : 'translateX(0px)';
-  document.getElementById('itemBin').style.width = menuOpen ? '100%' : 'calc(100% - 160px)';
-  document.getElementById('clientStatus').style.marginLeft = menuOpen ? '0' : '160px';
-  localStorage.setItem('menuOpen', JSON.stringify(value));
-};
-
-//Theme change click event
-document.getElementById('theme').addEventListener('click', function(){
-  themeIndex !== themes.length - 1 ? themeIndex ++ : themeIndex = 0; 
-  themeSwitch(themeIndex);
-});
-
-//Theme Switcher
-function themeSwitch(index){
-  let theme = themes[index];
-  document.getElementById('themeLabel').innerHTML =`Theme: ${theme.name}`;
-  document.documentElement.style.setProperty('--mainAccent', theme.mainColor);
-  localStorage.setItem('themeIndex', JSON.stringify(index));
-};
-
-//Night Mode toggle on click
-document.getElementById('night').addEventListener('click', function(){
-  nightMode = !nightMode;
-  setNightMode(nightMode);
-});
-
-//Set Night Mode
-function setNightMode(value){
-  document.documentElement.style.setProperty('--backColor', value ? '#282828' : '#edf0f1');
-  document.documentElement.style.setProperty('--itemColor', value ? '#454545' : '#fff');
-  document.documentElement.style.setProperty('--containerTextColor', value ? '#aaa' : '#666');
-  document.documentElement.style.setProperty('--menuHoverColor', value ? '#444' : '#aaa');
-  document.documentElement.style.setProperty('--itemTextColor', value ? '#ddd' : '#444');
-  document.documentElement.style.setProperty('--itemCompleteColor', value ? 'rgba(68,68,68,.3)' : 'rgba(255,255,255,.25)');
-  document.getElementById('nightLabel').innerHTML =`Night Mode: ${nightMode ? 'ON' : 'OFF'}`;
-  localStorage.setItem('nightMode', JSON.stringify(value));
-}
-
-//Task Button
-document.getElementById('tasks').addEventListener('click', function(){
-  renderList(viewings.TASKS);
-});
-
-//Delete Button
-document.getElementById('deleted').addEventListener('click', function(){
-  renderList(viewings.DELETED);
-});
-
-//Completed Button
-document.getElementById('done').addEventListener('click', function(){
-  renderList(viewings.DONE_TASKS);
-});
-
-//Focus on input on load
-document.getElementById('item').focus();
-
-//Add button pressed
-document.getElementById('add').addEventListener('click', function(){
-  let value = document.getElementById('item').value;
-  if(value){submitItem(value)}
-});
-
-//Header Logo and input bar transitions
-function headerStyling(){
-  document.getElementById('item').style.marginLeft = (isInputActive) ? '55px': '200px';
-  document.getElementById('item').style.width = (isInputActive) ? 'calc(100% - 55px)': 'calc(100% - 200px)';
-  document.getElementById('logo').style.width = (isInputActive) ? '0px': '140px';  
-  document.getElementById('logoSvg').style.width = (isInputActive) ? '0px': '140px';    
-}
-
-//Track click focus changes
-document.body.addEventListener('click',()=>{
-  if(document.activeElement !== document.getElementById('item')){
-    isInputActive = false;
-    headerStyling();
-    console.log('Input bar in not active')}
-})
-
-//'Enter' press = submit
-document.getElementById('item').addEventListener('keydown',function (e) {
-  let value = document.getElementById('item').value;
-  if (e.key === "Enter" && value) {submitItem(value)};
-  if (document.activeElement === this){
-    switch(e.key){
-      case "ArrowUp":
-        cycleInputHistory('UP');
-        break;
-      case "ArrowDown":
-        cycleInputHistory('DOWN');
-      break;
-    }
-
-  }});
-
-//Toggle CommandMode
-function toggleCommandMode(status) {
-  status ? document.getElementById('themeLabel').innerHTML = `Theme: ${'cmd'}` : themeSwitch(themeIndex);
-  status ? document.documentElement.style.setProperty('--mainAccent', '#000') : themeSwitch(themeIndex);
-  document.getElementById('item').value = '';
-}
-
-//Store input history to be recalled again (Like command prompt)
-let inputHistory = [];
-let inputHistoryIndex = -1;
-
-function cycleInputHistory(direction){
-  switch(direction){
-    case "UP":
-      if(!inputHistory[inputHistoryIndex + 1]){return};
-      inputHistoryIndex ++;
-      break;
-    case "DOWN":
-      if(!inputHistory[inputHistoryIndex - 1] && inputHistoryIndex - 1 !== -1){return};
-      inputHistoryIndex --;
-      break;
-  }
-  if(inputHistory[inputHistoryIndex] === undefined){return document.getElementById('item').value = ''};
-  document.getElementById('item').value = inputHistory[inputHistoryIndex];
-}
 
 //Submit item
 function submitItem(value,override){
@@ -406,7 +234,7 @@ function renderList(renderView){
       }
       break;
     default: 
-    //console.log(`Viewing: ${renderView} resulted in a error`);
+    alert(`Viewing: ${renderView} resulted in a error`);
   }
 };
 
@@ -424,34 +252,54 @@ function unRenderList(){
 
 //Update Data
 function dataObjectUpdate(){
+  if(userClient)return;
   localStorage.setItem('todoList', JSON.stringify(data));
-  console.log(data);
 };
 
 /////// ITEM MANIPULATION FUNCTIONS \\\\\\\
 
 //Add todo item
 function addItemTodo(obj, completed){
+  //Check for taggin symbols
+  let task = obj.task;
+
+  //#tags
+  let tagRegex = /([#]|[@])\w+/g;
+  if (tagRegex.test(task)){
+      task = task.split(' ');
+      let newTask = [];
+      for (let word in task){
+        if(tagRegex.test(task[word])){
+          task[word] = `<span class="tagged">${task[word]}</span>`;
+          // console.log(task);
+          newTask.push(task[word]);
+        } else newTask.push(task[word]);
+      }
+    task = newTask.join(' ');
+  }
+
   //Decide which list to add to
   let list = (completed) ? document.getElementById('completed') : document.getElementById('todo');
+  
   //Create list elem and add text
   let item = document.createElement('li');
-  item.innerText = obj.task;
-  //Create a div for buttons
+  item.innerHTML = task;
+
+  //Create button elements
   let buttons = document.createElement('div');
   buttons.classList.add ('buttons');
-  //Create remove button
+
   let remove = document.createElement('button');
   remove.classList.add ('remove');
   remove.innerHTML = removeSVG;
-  //Add button event to remove button
+  
   remove.addEventListener('click', removeItem);
-  //Create complete button
+  
   let complete = document.createElement('button');
   complete.classList.add ('complete');
   complete.innerHTML = completeSVG;
-  //Add button event to complete button
   complete.addEventListener('click', completeItem);
+
   //Appends elems together
   buttons.appendChild(remove);
   buttons.appendChild(complete);
@@ -524,10 +372,10 @@ function completeItem(){
       update(data.completed[itemIndex],itemPush);
       //Timestamp
       completedItem.setAttribute('title',`Made: ${itemPush.creationDate}`);
-      //Data manipulation
+      //Object and list mutations
       data.todo.push(itemPush);
       data.completed.splice(itemIndex,1);
-      //DOM manipulation
+      //Rendering and DOM manipulation
       completedItem.className = "uncomplete";
       listParent.removeChild(completedItem);
       targetList.insertBefore(completedItem, targetList.childNodes[0]);

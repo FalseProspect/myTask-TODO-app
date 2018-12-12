@@ -150,24 +150,30 @@ header button#logo svg .fill{
 }
 
 .clientStatus{
-  width: 25%;
-  margin: 0 auto;
-  text-align: center;
+  width: 100px;
 }
 
 #clientStatus{
+  min-width: 100px;
+  background: var(--mainAccent);
   color: var(--inputTextColor);
   box-shadow: 0px 2px 4px rgba(44, 62, 80, 0.15);
   border-bottom-left-radius: 10px;
   border-bottom-right-radius: 10px;
-  transition: all .5s ease;
+  display: block;
+  position: absolute;
+  margin: 0 auto;
+  text-align: center;
+  z-index: 4;
+  left: calc(50% - 50px);
+  transition: all .2s,margin .5s ease;
 }
 
 .container{
   margin-left: 0px;
   width: 100%;
   float: left;
-  padding: 15px;
+  padding: 25px 15px 15px 15px;
   transition: all .5s ease;
 }
 
@@ -195,15 +201,21 @@ ul.todoList li{
   white-space: wrap; 
   overflow:hidden;
   overflow-y: hidden;
+  animation: fadein .3s;
 }
 
-body::-webkit-scrollbar-track
+@keyframes fadein {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+*::-webkit-scrollbar-track
 {
 	border-radius: 10px;
 	background-color: transparent;
 }
 
-body::-webkit-scrollbar
+*::-webkit-scrollbar
 {
   height: 5px;
   width: 5px;
@@ -211,7 +223,7 @@ body::-webkit-scrollbar
   z-index: 3;
 }
 
-body::-webkit-scrollbar-thumb
+*::-webkit-scrollbar-thumb
 {
   border-radius: 10px;
 	background-color: var(--buttonColor);
@@ -242,7 +254,26 @@ ul.todoList li .buttons button{
   cursor: pointer;
 }
 
-ul.todoList li .buttons button:last-of-type:before{
+ul.todoList li input{
+  background: rgba(255, 255, 255,0.2);
+  color: var(--itemTextColor);
+  border-radius: 5px;
+  border: 0;
+  padding: 4px 60px 4px 0;
+  width: 100%;
+}
+
+ul.todoList li::after{
+  content: '';
+  width: 2px;
+  height: calc(60%);
+  position: absolute;
+  top: 20%;
+  right: 48px;
+  background: var(--backColor);
+}
+
+/* ul.todoList li .buttons button:last-of-type:before{
   content: '';
   width: 2px;
   height: 30px;
@@ -250,7 +281,7 @@ ul.todoList li .buttons button:last-of-type:before{
   top:10px;
   left: 0px;
   background: var(--backColor);
-}
+} */
 
 ul.todoList li .buttons button svg{
 width: 22px;
@@ -336,7 +367,8 @@ ul.todoList#todo:after{
 
 .menu{
   position: fixed;
-  width: 170px;
+  border-right: 2px solid var(--mainAccent);
+  width: 145px;
   background: var(--backColor);
   height: 100%; 
   transform: translateX(-200px);
@@ -347,12 +379,12 @@ ul.todoList#todo:after{
   display: block;
   position: relative;
   width: 100%;
-  height: 4em;
-  padding: 1.5em 0 0 0;
+  height: 3em;
+  padding: 1em 0 0 0;
   margin: 1em 0 1em 0;
   text-decoration: none;
-  text-align: center;
-  background: var(--backColor);
+  /* text-align: center; */
+  /* background: var(--backColor); */
   border-top-right-radius: 5px;
   border-bottom-right-radius: 5px;
   cursor: pointer;
@@ -377,7 +409,7 @@ ul.todoList#todo:after{
   width: 30px;
   height: 30px;
   position: absolute;
-  top: 43%;
+  top: 40%;
   left: 15%;
   margin: -8px 0 0 -8px;
   fill: var(--containerTextColor);
@@ -386,6 +418,10 @@ ul.todoList#todo:after{
 .menu a svg#doneIcon{
   border-radius: 15px;
   border: 1.5px solid var(--containerTextColor);
+}
+
+.menu a svg#nightIcon{
+  top: 35%;
 }
 
 .menu a:hover svg,
@@ -398,30 +434,38 @@ ul.todoList#todo:after{
   border: 1.5px solid var(--inputTextColor);
 }
 
-.menu a div#themeLabel,
-.menu a div#nightLabel{
-  margin-left: 38px;
+.menu a div{
+  margin-top: -1px;
+  margin-left: 55px; 
 }
 
-svg#nightIcon{
-  left: 10%;
+.menu a div#themeLabel::before{
+  position: absolute;
+  text-align: center;
+  top: 7%;
+  content: 'Theme:';
 }
 
-.menu a div#doneLabel{
-  margin-left: 22px;
+.menu a div#themeLabel{
+  padding-top: 5px;
+  text-decoration: underline;
 }
 
 .menu a#profile{
-  padding: 1.35em 0 0 0;
   position: absolute;
-  bottom: 100px;
+  bottom: 10%;
 }
 
-.menu a#profile::after{
+.menu a div#profileLabel{
+  text-align: center;
+  margin-left: 0;
+}
+
+.menu a div#profileLabel::before{
   position:absolute;
-  left: 37%;
+  text-align: center;
   font-size: .8rem;
-  bottom: .5rem;
+  top: 8%;
   content: attr(data-profile);
 }
 
@@ -435,7 +479,7 @@ ul.todoList li.deleted .buttons button.complete{
   visibility: hidden;
 }
 ul.todoList li.deleted .buttons button.remove{
-  margin-left: 25%;
+  margin-left: 50%;
 }
 
 ul.todoList li.over {
@@ -445,6 +489,12 @@ ul.todoList li.over {
 #user{
   position: absolute;
   visibility: hidden;
+}
+
+.tagged{
+  text-decoration: underline;
+  color: var(--mainAccent);
+  cursor: pointer;
 }
 
 @media screen and (max-width: 800px){
@@ -472,26 +522,14 @@ ul.todoList li.over {
     top: 5px;
   }
   .menu a{
-    width: 170px;
-    height: 3.5em;
-    padding: 1.2em 0 0 0;
+    width: 140px;
   }
   .menu a svg{
     width: 25px;
     height: 25px;
     position: absolute;
-    top: 43%;
+    top: 40%;
     left: 10%;
     margin: -8px 0 0 -8px;
-  }
-  .menu a#profile{
-    padding: 1em 0 0 0;
-  }
-  .menu a#profile::after{
-    position:absolute;
-    left: 37%;
-    font-size: .8rem;
-    bottom: .55em;
-    content: attr(data-profile);
   }
 }
